@@ -19,11 +19,10 @@
 <h3 align="center">The Peptonizer 2000</h3>
 
   <p align="center">
-    Integrating PepGM and Unipept for probability based taxonomic analysis of metaproteomic samples
+    Integrating PepGM and Unipept for probability-based taxonomic inference of metaproteomic samples
     <br />
   </p>
 </div>
-
 
 
 <!-- TABLE OF CONTENTS -->
@@ -57,33 +56,44 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-### The preprint for PepGM is out! You can read it [here](https://www.biorxiv.org/content/10.1101/2022.09.21.508832v1).
+Introducing the Peptonizer2000 - a tool that combines the capabilities of Unipept and PepGM to analyze
+metaproteomic mass spectrometry-based samples. Originally designed for taxonomic inference of viral
+mass spectrometry-based samples, we've extended PepGM's functionality to analyze metaproteomic samples by
+retrieving taxonomic information from the Unipept database.
 
-PepGM is a probabilistic graphical model embedded into a snakemake workflow for taxonomic inference of viral proteome samples. PepGM was 
-developed by the the eScience group at BAM (Federal Institute for Materials Research and Testing).
+PepGM is a probabilistic graphical model developed by the eScience group at BAM (Federal Institute for Materials
+Research and Testing) that uses belief propagation to infer the taxonomic origin of peptides and taxa in viral samples.
+You can learn more about PepGM on our eScience group at BAM (Federal Institute for Materials Research and Testing).
+Please refer to our [GitHub](https://github.com/BAMeScience/PepGM) page.
 
+Unipept, on the other hand, is a web-based metaproteomics analysis tool that provides taxonomic information for
+identified peptides. To make it work seamlessly with PepGM, we've extended Unipept with new functionalities that
+restrict the taxa queried and provide all potential taxonomic origins of the peptides queried. Check out more
+information about Unipept [here](https://unipept.ugent.be/).
 
-PepGM uses convolution trees. The code for the convolution trees was developed and is described in: [https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0091507](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0091507)<br>
-PepGM uses a version of the belief propagatin algorithm with a graphical network architecture previously described in [https://pubs.acs.org/doi/10.1021/acs.jproteome.9b00566](https://pubs.acs.org/doi/10.1021/acs.jproteome.9b00566)
+With the Peptonizer2000, you can look forward to a comprehensive and streamlined workflow that simplifies
+the process of identifying peptides and their taxonomic origins in metaproteomic samples.
 
+The Peptonizer2000 workflow is comprised of the following steps:
 
-Unipept is web-based metaproteomic analysis tool. You can read more about it [here](https://unipept.ugent.be/)
+1. Start by conducting a database search using X!Tandem and [MS2Rescore](https://github.com/compomics/ms2rescore).
+   The reference database has to be provided by the user.
+2. Query all identified peptides in the Unipept API,
+   and restrict the taxonomic range queried based on any prior knowledge of the sample.
+3. Assemble the peptide-taxon associations provided by Unipept into a bipartite graph,
+   where peptides and taxa are represented by different nodes, and an edge is drawn between a peptide and a taxon
+   if the peptide is part of the taxon's proteome.
+4. Transform the bipartite graph into a factor graph using convolution trees and conditional probability table
+   factors (CPD).
+5. Run the belief propagation algorithm multiple times with different sets of CPD parameters until convergence,
+   to obtain posterior probabilities of candidate taxa.
+6. Use an empirically deduced metric to determine the ideal graph parameter set.
+7. Output the top 15 scoring taxa as a results barchart. The results are also available as comma-separated files
+   for further downstream analysis or visualizations.
 
-
-The Peptonizer workflow includes the following steps:
-
-1. Database search using X!Tandem and MS2Rescore. The database has to be provided.  <br>
-2. All peptides found are queried in the Unipept API. Based on previous knowledge about the sample, the user is able to restrict the taxonomic range queried if there is previous knowledge about the sample. <br>
-3. The peptide-taxon associations provided by Unipept are assembled into a bipartite graph. On category of nodes are peptides, the other taxa. an edge is drwan between two nodes of a peptide is part of a taxons proteome.<br>
-4. The bipartite graph is transformed into a factor graph using convolution trees and conditional probability table factors (CPD). scripts: CreatePepGMGraph.py and FactorGraphGeneration.py<br>
-5. For different sets of CPD parameters, the belief propagation algorithm is run until convergence to obtain the posterior probabilites of the taxa. scripts: belief_propagation.py and PepGM.py <br>
-6. Through an  empirically deduced metric, the ideal parameter set is inferred. script GridSearchAnalysis.py <br>
-7. For this ideal parameter set, we output a results barchart showcasing the 15 best scoring tax. scripts: BarPlotResults. Better visualisations of the results will be provided in the future. The results are also output as .csv files for further own analysis or visualizations.<br> 
 
 <div align="center">
-  <a href=https://git.bam.de/tholstei/pepgm/>
     <img src="images/workflow.png" alt="worklfow scheme" width="500">
-    </a>
 </div>
 
 <br>
@@ -95,8 +105,9 @@ The Peptonizer workflow includes the following steps:
 <!-- INPUT -->
 
 ## Input
-* Your spectrum file in .mgf format
-* A reference database in fasta format (see <a href="#preparation">Preparation</a>) <br>
+
+* Your raw spectrum file in mgf format
+* A reference database in fasta format <br>
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -105,47 +116,14 @@ The Peptonizer workflow includes the following steps:
 
 ### Prerequisites
 
-Make sure you have git installed and clone the repo:
-   ```sh
-   git clone https://github.com/BAMeScience/PepGM.git
-   ```
-PepGM is a snakemake workflow developed with snakemake 5.10.0. <br>
-Installing snakemake requires mamba.
-
-To install mamba:
-  ```sh
-conda install -n <your_env> -c conda-forge mamba
-  ```
-
-To install snakemake:
-```sh
-conda activate <your_env>
-mamba create -c conda-forge -c bioconda -n <your_snakemake_env> snakemake
-```
-In accordance with the Snakemake recommendations, we suggest to save your sample data 
-in `resources` folder. All outputs will be saved in `results`.
-
-Additional dependencies necessary are Java and GCC.
-
-The Peptonizer2000 is tested for Linux OS. <br>
-
-
-## Preparation
-
-
-<p align="right">(<a href="#top">back to top</a>)</p>
-
-<!-- USAGE EXAMPLES -->
-## Usage
+Install PepGM. Find installation instructions [here](https://github.com/BAMeScience/PepGM).
 
 ### Configuration file 
-The Peptonizer2000 needs a configuration file in `yaml` format to set up the workflow. 
-An exemplary configuration file is provided in `config/config.yaml`. <br>
-The followin
-Please insert your NCBI account details (mail & key) and provide the required absolute paths to
-* SamplePath
 
+The Peptonizer2000 relies on a configuration file in `yaml` format to set up the workflow.
+An example configuration file is provided in `config/config.yaml`. <br>
 Do not change the config file location.
+
 <details>
   <summary>Details on the configuration parameters </summary> <br>
     <details> <summary>Run panel <br> </summary> 
