@@ -118,65 +118,91 @@ The Peptonizer2000 workflow is comprised of the following steps:
 
 Install PepGM. Find installation instructions [here](https://github.com/BAMeScience/PepGM).
 
-### Configuration file 
+### Configuration file
 
-The Peptonizer2000 relies on a configuration file in `yaml` format to set up the workflow.
+Peptonizer2000 relies on a configuration file in `yaml` format to set up the workflow.
 An example configuration file is provided in `config/config.yaml`. <br>
 Do not change the config file location.
 
-<details>
-  <summary>Details on the configuration parameters </summary> <br>
-    <details> <summary>Run panel <br> </summary> 
-    Set up the workflow of your Peptonizer run by providing parameters that fill wildcards to locate input files
-    such as raw spectra or reference database files. Thus, use file basenames i.e., without file 
-    suffix, that your files already have or rename them accordingly. <br><br>
-    Run: Name of your run that is used to create a subfolder in the results directory. <br>
-    Sample: Name of your sample that is used to create a subfolder in the run directory. <br> 
-    Reference: Name of reference database (e.g. human). <br>
+<details> 
+   <details > <summary> PepGM parameter </summary>
+   <ul>
+      <li> DataDir:  Relative path to raw spectra </li>
+      <li> DatabaseDir: Relative path to database </li>
+      <li> ResultsDir: Relative path to results </li>
+      <li> ResourcesDir: Relative path to resources </li> 
+      <li> ExperimentName: Name of subfolder in results </li>
+      <li> AddHostandCraptoDB:  Search database is extended by a host and cRAP database.
+      Mutually exclusive to Filter Spectra. </li>
+      <li>TaxaInPlot: # of inferred taxa that appear in the barplot that is created of the results csv</li>
+      <li>Alpha: Grid search increments for alpha </li>
+      <li>Beta: Grid search increments for beta </li>
+      <li>prior: grid search increments for prior </li>
+   </ul>
+   </details>
 
-    <details> <summary>Input panel <br> </summary> 
-    Specify input file and directory paths. <br><br>
-    Sample spectra: Path to raw spectra file. <br>   
-    Parameter: Path to SearchGUI parameter file. <br>
-    Sample data: Path to directory that contains sample raw spectra files. <br>
-    Database: Path to directory that contains the reference database. <br>
-    Resources: Relative path to resources folder <br>
-    Results: Relative path to results folder <br>
-    TaxID mapping: Relative path to folder that contains mapped taxIDs. <br> <br>
-    </details>
-    <details> <summary>X!Tandem panel <br> </summary> 
-    Fill in the parameters necessary for the X!Tandem search. Please refer to the [X!Tandem documentation](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0091507) regarding the parameters. <br><br>
-    </details>
-    <details> <summary>MS2Rescore panel <br> </summary> 
-    Fill in the parameters necessary for the MS2Rescore rescoring. Please refer to the MS2Rescore documentation [X!Tandem documentation](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0091507) regarding the parameters. <br><br>
-    </details>
-    <details> <summary>PepGM panel <br></summary>
-    Grid search: Choose increments for alpha, beta and prior that are to be included in the grid search to tune
-    graphical model parameters. Do not put a comma between values. For metaproteomics analysis, you can significantly speed up the Peptonizer by reducing the amount of parameters searched. For samples where you expect good peptide coverage per species, we recommmend alpha between 0.8 and 0.9, beta between 0.2 and 0.4 and gamma of 0.5. <br>
-    Results plotting: Number of taxa in the final species identification barplot. <br><br> 
-    </details>
+   <details > <summary> Sample specific parameter </summary>
+   <ul>
+      <li> SpectraFileType: mgf or mzML </li>
+      <li> SampleName: wildcard for spectra file and folder name </li>
+      <li> ReferenceDBName: wildvard for reference database name </li>
+      <li> HostName: Host name </li> 
+      <li> ScientificHostname: Scientific host name. Format: " 'scientific host' "  </li>
+   </ul>
+   </details>
 
+   <details > <summary> X!Tandem parameter </summary>
+   <ul>
+       <li>search_engine: Search engine name </li>
+       <li>xtandem_default: # Absolute X!Tandem default configuration file path </li>
+       <li>xtandem_fmme: Fragment mass tolerance (default=0.4) </li>
+       <li>xtandem_fmmeu: ragment mass tolerance unit (default="DA")</li>
+       <li>xtandem_pmmep: Precursor mass tolerance plus (default=100) </li>
+       <li>xtandem_pmmem: Precursor mass tolerance minus (default=100)</li>
+       <li>xtandem_pmmeu: Precursor mass tolerance unit (default="ppm") </li>
+       <li>xtandem_mods_fixed: Fixed modifications, comma separated (default="57@C")</li>
+       <li>xtandem_mods_variable: Variable modifications, e.g. "16@M", comma separated (default=None)</li>
+       <li>xtandem_mods_variable_nterm: Variable N-terminal modifications, e.g."+42.0@[", comma separated (default=None)</li>
+       <li>xtandem_add_params: Additional parameters for X!Tandem as json dictionary{"param1" : "value", "param2" : "value", ...} which will be added to thextandem_input.xml</li>
+   </ul>
+   </details>
+
+   <details > <summary> MS2Rescore parameter </summary>
+   <ul>
+       <li>RescorePipeline: Pipeline to use,
+      any of ['infer', 'pin', 'tandem', 'maxquant', 'msgfplus', 'peptideshaker']. Default: ['infer'] </li>
+       <li>RescoreFeatures: Feature sets for which to generate PIN files, 
+      any of ["searchengine", "ms2pip", "rt"]. Default:  ['searchengine', 'rt', 'ms2pip'].</li>
+       <li>RunPercolator:  Run Percolator within MS²Rescore. Default: False. </li>
+       <li>FragModel: MS2PIP model to use. Default: 'HCD' </li>
+       <li>Mods: Array of peptide mass modifications. Refer to #/definitions/modifications 
+      <a href="https://github.com/compomics/ms2rescore/blob/master/configuration.md">here</a>. </li>
+   </ul>
+   Please check the official 
+   <a href="http://compomics.github.io/projects/ms2rescore#configuration-file">MS2Rescore documentation</a>
+   for more details.
+
+
+   </details>
+
+   <details > <summary> UniPept parameter </summary>
+   <ul>
+       <li>TaxaNumber: # of taxa </li>
+       <li>targetTaxa: Comma separated list of taxa compromises the UniPept query</li>
+       <li>FDR: FDR level, decimal</li>
+   </ul> 
+   </details>
 </details>
-
-
-### Through the command line
-
-The Peptonizer2000 needs to be run from the command line. To run the snakemake workflow, 
-you need to be in your PepGM repository and have the Snakemake conda environment activated. 
-Run the following command 
-```sh
-  snakemake --use-conda --conda-frontend conda --cores <n_cores> 
-  ```
-Where `n_cores` is the number of cores you want snakemake to use. 
-<p align="right">(<a href="#top">back to top</a>)</p>
 
 ### Output files
 
 All Peptonizer2000 output files are saved into the results folder and include the following: <br>
 
 Main results: <br>
-- PepGM_Results.csv: Table with values ID, score, type (contains all taxids under 'ID' and all probabilities under 'score' tosterior probabilities of n (default: 15) highest scoring taxa <br>
- <br>
+
+- PepGM_Results.csv: Table with values ID, score, type (contains all taxids under 'ID' and all probabilities under '
+  score' tosterior probabilities of n (default: 15) highest scoring taxa <br>
+  <br>
 
 Additional (intermediate): <br>
 - Intermediate results folder sorted by their prior value for all possible grid search parameter combinations
@@ -184,40 +210,6 @@ Additional (intermediate): <br>
 - PepGM_graph.graphml: graphml file of the graphical model (without convolution tree factors). Useful to visualize the graph structure and peptide-taxon connections <br>
 - paramcheck.png: barplot of the metric used to determine the graphical model parameters for n (default: 15) best performing parameter combinations <br>
 - log files for bug fixing
-
-## Toy example
-Will be provided.
-
-
-
-<p align="right">(<a href="#top">back to top</a>)</p>
-
-<!-- ROADMAP -->
-## Roadmap
-
-- [ ] Extensive testing
-- [ ] Selection of taxonomic resolution for the results
-
-
-See the [open issues](https://github.com/BAMeScience/repo_name/issues) for a full list of proposed features (and known issues).
-
-<p align="right">(<a href="#top">back to top</a>)</p>
-
-
-
-<!-- CONTRIBUTING -->
-## Contributing
-
-Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
-
-If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
-Don't forget to give the project a star! Thanks again!
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -231,12 +223,11 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 
-
 <!-- CONTACT -->
 ## Contact
 
 Tanja Holstein - [@HolsteinTanja](https://twitter.com/HolsteinTanja) - tanja.holstein@bam.de <br>
-Franziska Kistner - [LinkedIn](https://www.linkedin.com/in/franziska-kistner-58a57b18b) - franziska.kistner@bam.de
+Franziska Kistner - [LinkedIn](https://www.linkedin.com/in/franziska-kistner-58a57b18b) - franziska.kistner@bam.de <br>
 Pieter Verschaffelt - pieter.verschaffelt@ugent.be
 
 <p align="right">(<a href="#top">back to top</a>)</p>
