@@ -73,4 +73,5 @@ dependencies:
   - wheel=0.37.1=pyhd3eb1b0_0
   - xz=5.2.10=h5eee18b_1
   - zlib=1.2.13=h5eee18b_0
+  - requests
 prefix: /home/tholstei/anaconda3/envs/install_env/envs/Unipeptquery

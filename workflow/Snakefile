@@ -3,8 +3,6 @@
 WorkflowPath = os.path.dirname(os.path.realpath(workflow.snakefile))
 include: WorkflowPath +'/rules/config.smk'
 include : WorkflowPath + '/rules/CurateDatabase.smk'
-include : WorkflowPath + '/rules/buildDatabase.smk'
-include : WorkflowPath + '/rules/filterHostCrap.smk'
 include : WorkflowPath + '/rules/XTandem.smk'
 include : WorkflowPath + '/rules/MS2Rescore.smk'
 include: WorkflowPath + '/rules/ParsePouttoUnipept.smk'
@@ -22,7 +20,6 @@ rule CreateFactorGraph:
      conda: 'envs/graphenv.yml'
      params:
           samplename = SampleName,
-          hostname = HostName,
           DBname = ReferenceDBName,
           ResultsDir = ResultsDir
      log: ResultsDir +'{DBname}.log'
@@ -35,7 +32,6 @@ rule RunPepGM:
      conda: 'envs/graphenv.yml'
      params:
           samplename = SampleName,
-          hostname = HostName,
           DBname = ReferenceDBName,
      log : ResultsDir +'Prior{Prior}/log/{DBname}_a{alpha}_b{beta}_pepGM.log'
      shell: 'python3  workflow/scripts/PepGM.py --GraphMLPath {input} --prior {wildcards.Prior} --alpha {wildcards.alpha} --beta {wildcards.beta} --out {output} &>> {log}'
@@ -58,9 +54,8 @@ rule FindBestParameters:
      conda: 'envs/graphenv.yml'
      log : ResultsDir +'paramcheck.log'
      params: Results = ResultsDir,
-             host = ScientificHostName,
              DB = ReferenceDBName
-     shell: 'python3 workflow/scripts/SearchAnalysisOutputFormatter.py --weights {input[0]} --reference_db {params.DB} --host {params.host} --resultsfolder {params.Results} --out {output[0]} &>> {log}'
+     shell: 'python3 workflow/scripts/SearchAnalysisOutputFormatter.py --weights {input[0]} --reference_db {params.DB} --resultsfolder {params.Results} --out {output[0]} &>> {log}'
 
 
 

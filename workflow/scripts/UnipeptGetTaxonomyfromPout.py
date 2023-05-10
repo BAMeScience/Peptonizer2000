@@ -114,9 +114,9 @@ def PostInfoFromUnipeptChunks(request_json, out_file, failed_requests_file):
     :return: None
     """
 
-    logging.basicConfig(filename= failed_requests_file+'.log', level=logging.INFO)
+    logging.basicConfig(filename= failed_requests_file, level=logging.INFO)
     
-    url = "http://api.unipept.ugent.be/mpa/pept2filtered.json"
+    url = 'http://127.0.0.1:3000/mpa/pept2filtered'
     print('now querying Unipept in '+str(len(request_json))+' chunks')
     
     
@@ -125,26 +125,27 @@ def PostInfoFromUnipeptChunks(request_json, out_file, failed_requests_file):
     for chunk in request_json:
         try:
 
-            request = requests.post(url,json.dumps(chunk),headers={'content-type':'application/json'}, timeout = None) 
+            request = requests.post(url,json.dumps(chunk),headers={'content-type':'application/json'}, timeout = 2) 
             request.raise_for_status()
 
             with open(out_file, 'a') as f_out:
                 print(request.text,file=f_out)
+            print('sucessfully queried a chunk')
         
         except requests.exceptions.RequestException as e:
 
-            logging.error(f'Request {chunk} failed with error {e}')
+            logging.error(f'Request {url} failed with error {e}')
             failed_requests[json.dumps(chunk)] = e
 
     #retry failed requests        
     for chunk,error in failed_requests.items():
         try: 
-            request = requests.post(url,chunk,headers={'content-type':'application/json'}, timeout = None) 
+            request = requests.post(url,chunk,headers={'content-type':'application/json'}, timeout = 2) 
             request.raise_for_status()
             with open(out_file, 'a') as f_out:
                 print(request.text,file=f_out)
         
-        except:
+        except requests.exceptions.RequestException as e:
             logging.error(f'Retry request to {url} failed with error: {e}')
 
 
@@ -177,7 +178,7 @@ def PostInfoFromUnipept(request_json, out_file):
     :return: None
     """
     
-    url = "http://api.unipept.ugent.be/mpa/pept2filtered.json"
+    url = "http://api.unipept.ugent.be/mpa/pept2filtered"
     print('now querying Unipept')
     request = requests.post(url,json.dumps(request_json),headers={'content-type':'application/json'},timeout=None )    
     

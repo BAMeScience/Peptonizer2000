@@ -6,7 +6,6 @@ ResultsDir = config['ResultsDir'] + config['ExperimentName'] +'/'+config['Sample
 XTandemDir = config['ResultsDir'] + config['ExperimentName'] +'/'+config['SampleName']+'/XTandem/'
 MS2RescoreDir = config['ResultsDir'] + config['ExperimentName'] +'/'+config['SampleName']+'/MS2Rescore/'
 ResourcesDir = config['ResourcesDir']
-TaxidMapping = config['TaxidMapping']
 ResultsDirStrain = config['ResultsDir']
 
 FilterSpectra = config['FilterSpectra']
@@ -14,8 +13,6 @@ AddHostandCrapToDB = config['AddHostandCrapToDB']
 ExperimentName = config['ExperimentName']
 SpectraFileType = config['SpectraFileType']
 SampleName = config['SampleName']
-HostName = config['HostName']
-ScientificHostName = config['ScientificHostName']
 ReferenceDBName = config['ReferenceDBName']
 
 
