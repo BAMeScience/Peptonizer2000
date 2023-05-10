@@ -132,8 +132,6 @@ Do not change the config file location.
       <li> ResultsDir: Relative path to results </li>
       <li> ResourcesDir: Relative path to resources </li> 
       <li> ExperimentName: Name of subfolder in results </li>
-      <li> AddHostandCraptoDB:  Search database is extended by a host and cRAP database.
-      Mutually exclusive to Filter Spectra. </li>
       <li>TaxaInPlot: # of inferred taxa that appear in the barplot that is created of the results csv</li>
       <li>Alpha: Grid search increments for alpha </li>
       <li>Beta: Grid search increments for beta </li>
@@ -146,8 +144,6 @@ Do not change the config file location.
       <li> SpectraFileType: mgf or mzML </li>
       <li> SampleName: wildcard for spectra file and folder name </li>
       <li> ReferenceDBName: wildvard for reference database name </li>
-      <li> HostName: Host name </li> 
-      <li> ScientificHostname: Scientific host name. Format: " 'scientific host' "  </li>
    </ul>
    </details>
 
