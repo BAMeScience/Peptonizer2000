@@ -13,7 +13,7 @@
 <br />
 <div align="center">
   <a href=https://git.bam.de/tholstei/pepgm/>
-    <img src="images/peptonizer.jpg" alt="Logo"  height="150">
+    <img src="images/peptonizer.jpg" alt="Logo"  height="300">
   </a>
 
 <h3 align="center">The Peptonizer 2000</h3>
