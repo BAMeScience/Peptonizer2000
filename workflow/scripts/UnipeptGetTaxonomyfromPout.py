@@ -5,6 +5,7 @@ import os.path
 from ete3 import NCBITaxa
 import argparse
 import logging
+import time
 
 ncbi = NCBITaxa()
 
@@ -85,7 +86,7 @@ def PepListNoMissedCleavages(peptide):
     return peptides
 
 
-def generatePostRequestChunks(peptides,TargetTaxa,chunksize=20):
+def generatePostRequestChunks(peptides,TargetTaxa,chunksize=10):
     '''
     Generates POST requests (json) queryong a chunk of peptides from petide list and target taxon
     :param peptides: list of peptides to query in Unipept
@@ -116,21 +117,27 @@ def PostInfoFromUnipeptChunks(request_json, out_file, failed_requests_file):
 
     logging.basicConfig(filename= failed_requests_file, level=logging.INFO)
     
-    url = 'http://127.0.0.1:3000/mpa/pept2filtered'
+    #url = 'http://127.0.0.1:3000/mpa/pept2filtered'
+    url = 'http://api.unipept.ugent.be/mpa/pept2filtered'
     print('now querying Unipept in '+str(len(request_json))+' chunks')
     
     
     #try Unipept query in chunks
     failed_requests = {}
+    count = 0
     for chunk in request_json:
+        start = time.time()
         try:
 
-            request = requests.post(url,json.dumps(chunk),headers={'content-type':'application/json'}, timeout = 2) 
+            request = requests.post(url,json.dumps(chunk),headers={'content-type':'application/json'}, timeout = 1800) 
             request.raise_for_status()
 
             with open(out_file, 'a') as f_out:
                 print(request.text,file=f_out)
-            print('sucessfully queried a chunk')
+            end = time.time()
+            print('sucessfully queried a chunk, number '+str(count) +' out of '+str(len(request_json))+'\n time taken' + str(end-start))
+            count += 1
+
         
         except requests.exceptions.RequestException as e:
 
@@ -140,7 +147,7 @@ def PostInfoFromUnipeptChunks(request_json, out_file, failed_requests_file):
     #retry failed requests        
     for chunk,error in failed_requests.items():
         try: 
-            request = requests.post(url,chunk,headers={'content-type':'application/json'}, timeout = 2) 
+            request = requests.post(url,chunk,headers={'content-type':'application/json'}, timeout = 3600) 
             request.raise_for_status()
             with open(out_file, 'a') as f_out:
                 print(request.text,file=f_out)
