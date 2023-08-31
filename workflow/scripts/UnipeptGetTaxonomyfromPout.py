@@ -6,6 +6,9 @@ from ete3 import NCBITaxa
 import argparse
 import logging
 import time
+import asyncio
+import aiohttp
+import sys
 
 ncbi = NCBITaxa()
 
@@ -13,11 +16,11 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument('--UnipeptResponseFile', type = str, required = True, help = 'path to Unipept response .json file')
 parser.add_argument('--TaxonomyQuery', required = True, help = 'taxa to query in Unipept. If querying all taxa, put [1]') 
-parser.add_argument('--NumberOfTaxa', type = int, required = True, help = 'number of taxa to include in the output' )
 parser.add_argument('--FDR', type = float, required = True, help = 'min peptide score for the peptide to be included in the search')
 parser.add_argument('--PoutFile', type = str, required = True, help = 'path to percolator(ms2rescore) Pout file')
 parser.add_argument('--pep_out', type = str, required = True, help = 'path to csv out file')
 parser.add_argument('--logfile', type = str, required = True, help ='path to logfile of failed unipeptquery attempts')
+#parser.add_argument('--UnipeptRequestLim', type = int, required = False, default = 3 , help = ' number of requests allowed to be executed in parallel on the UNipept server')
 
 
 args = parser.parse_args()
@@ -86,12 +89,13 @@ def PepListNoMissedCleavages(peptide):
     return peptides
 
 
-def generatePostRequestChunks(peptides,TargetTaxa,chunksize=10):
+def generatePostRequestChunks(peptides,TargetTaxa,chunksize=10,cutoff= 1000):
     '''
     Generates POST requests (json) queryong a chunk of peptides from petide list and target taxon
     :param peptides: list of peptides to query in Unipept
     :param TargetTaxa: list of one or more taxa to include in the Unipept query
     :param chunksize: number of peptides to be requested from Unipept
+    :param cutoff: number of proteins a peptide is associated to above which said peptide will be removed from the query by Unipept. This enhances query speed.
     '''
     print('querying taxa ', TargetTaxa)
     AllTargetTaxa = []
@@ -101,7 +105,7 @@ def generatePostRequestChunks(peptides,TargetTaxa,chunksize=10):
     
     
     Listofpeptides = [peptides[i:i + chunksize] for i in range(0, len(peptides), chunksize)]
-    Listofrequests = [{"peptides":chunk, "taxa":AllTargetTaxa} for chunk in Listofpeptides]
+    Listofrequests = [{"cutoff":cutoff, "peptides":chunk, "taxa":AllTargetTaxa} for chunk in Listofpeptides]
 
     return Listofrequests
 
@@ -128,7 +132,7 @@ def PostInfoFromUnipeptChunks(request_json, out_file, failed_requests_file):
     for chunk in request_json:
         start = time.time()
         try:
-
+            
             request = requests.post(url,json.dumps(chunk),headers={'content-type':'application/json'}, timeout = 1800) 
             request.raise_for_status()
 
@@ -157,40 +161,62 @@ def PostInfoFromUnipeptChunks(request_json, out_file, failed_requests_file):
 
 
 
-def generatePostRequest(peptides,TargetTaxa):
-    '''
-    Generates POST request (json) from petide and target taxon
-    :param peptides: list of peptides to query in Unipept
-    :param TargetTaxa: list of one or more taxa to include in the Unipept query
-    '''
+#Functions for parallel asynchornous Unipept requests
+async def fetch_data(session, url, json_input, out_file, failed_requests,i,total_chunks):
+    try:
+        
+        async with session.post(url, json = json_input, timeout=6600,headers={'content-type':'application/json'}) as response:
+            response.raise_for_status()
+            result = await response.text()
+            with open(out_file, 'a') as f_out:
+                print(result, file=f_out)
+            print('successfully queried chunk ' + str(i) + ' out of ' +str(total_chunks))
+            return True
+        
+    except aiohttp.ClientError as e:
+        print('failed to query chunk ' +str(i))
+        time.sleep(30)
+        logging.error(f'Request to {url} failed with error: {e}')
+        failed_requests.append((json_input, e))
+        return False
 
-    print('number of peptides to be queried: ', len(peptides))
-    
-    AllTargetTaxa = []
-    for Taxon in TargetTaxa:
-        AllTargetTaxa.append(Taxon)
-        AllTargetTaxa.extend(ncbi.get_descendant_taxa(Taxon))
-    
-    request = {"peptides":peptides, "taxa":AllTargetTaxa}
-
-    return request
+async def limited_gather(semaphore, session, url, chunks, out_file, failed_requests,i,total_chunks):
+    async with semaphore:
+        return await fetch_data(session,url,chunks,out_file,failed_requests,i,total_chunks)
 
 
+ 
+async def main(request, out_file, failed_requests_file):
+    logging.basicConfig(filename=failed_requests_file, level=logging.INFO)
+    url = 'http://api.unipept.ugent.be/mpa/pept2filtered'
+    print('now querying Unipept in ' + str(len(request)) + ' chunks')
 
-def PostInfoFromUnipept(request_json, out_file):
-    """
-    Send all requests, get for each peptide the phylum, family, genus and collection of EC-numbers
-    :param request_list: list of Get Requests
-    :param result_file: csv file with Unipept info (phylum, family, genus and collection of EC-numbers)
-    :return: None
-    """
-    
-    url = "http://api.unipept.ugent.be/mpa/pept2filtered"
-    print('now querying Unipept')
-    request = requests.post(url,json.dumps(request_json),headers={'content-type':'application/json'},timeout=None )    
-    
-    with open(out_file, 'w') as f_out:
-        print(request.text,file=f_out)
+    semaphore = asyncio.Semaphore(3)  # Limit the number of concurrent requests to three
+
+    total_chunks = len(request)
+
+    async with aiohttp.ClientSession() as session:
+        failed_requests = []
+ 
+
+        limited_gather_tasks = []
+        i = 0
+        for chunk in request:
+           task = limited_gather(semaphore, session, url, chunk, out_file, failed_requests,i,total_chunks)
+           limited_gather_tasks.append(task)
+           i += 1
+
+        await asyncio.gather(*limited_gather_tasks)
+
+        # Retry failed requests
+        retry_tasks = []
+        for chunk, error in failed_requests:
+            task = limited_gather(semaphore,session, url, chunk, out_file, [],i,total_chunks)
+            retry_tasks.append(task)
+
+        await asyncio.gather(*retry_tasks)
+
+
 
 
 
@@ -205,7 +231,8 @@ with open(args.pep_out, 'a') as f_out:
 
 #get and save Info from Unipept if the response file doesn't exist yet
 request = generatePostRequestChunks(list(UnipeptPeptides.keys()),[int(item) for item in args.TaxonomyQuery.split(',')])    
-save = PostInfoFromUnipeptChunks(request,args.UnipeptResponseFile,args.logfile)
+#save = PostInfoFromUnipeptChunks(request,args.UnipeptResponseFile,args.logfile)
+save = asyncio.run(main(request, args.UnipeptResponseFile, args.logfile))
 
 
 #if __name__=='__main__':
@@ -213,15 +240,13 @@ save = PostInfoFromUnipeptChunks(request,args.UnipeptResponseFile,args.logfile)
 #    pep_score_psm = Poutparser(pout_file,0.05,'')
 
 
-#    UnipeptPeptides = dict()
-#    for peptide in pep_score_psm.keys():
-#        FullyTrypticPeptides = PepListNoMissedCleavages(peptide)
-#        for pep in FullyTrypticPeptides:
-#            UnipeptPeptides[pep] = pep_score_psm[peptide]
+ #   UnipeptPeptides = dict()
+ #   for peptide in pep_score_psm.keys():
+ #       FullyTrypticPeptides = PepListNoMissedCleavages(peptide)
+ #       for pep in FullyTrypticPeptides:
+ #           UnipeptPeptides[pep] = pep_score_psm[peptide]
 
-    #out = getInfoFromUnipept(UnipeptPeptides,'test_unipept.csv' )
-#    print(list(UnipeptPeptides.keys()))
-#    request = generatePostRequest(list(UnipeptPeptides.keys()),[11118])
+  #  save = asyncio.run(main(request, args.UnipeptResponse, args.logfile))
 
 
 #    out = PostInfoFromUnipept(request,'test_unipept.json')

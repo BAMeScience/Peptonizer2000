@@ -1,3 +1,8 @@
+# imports
+from pathlib import Path
+import pandas as pd 
+
+
 
 #configuration
 WorkflowPath = os.path.dirname(os.path.realpath(workflow.snakefile))

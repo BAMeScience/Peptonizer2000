@@ -1,5 +1,13 @@
 configfile: 'config/config.yaml'
 
+
+# global variables for each sample to import from tsv
+#SAMPLES = pd.read_csv(config["samples"],index_col="sample",sep='\t')
+#MGF_FILE = lambda wildcards: SAMPLES.at[wildcards.sample, 'mgf']
+#Database = lambda wildcards: SAMPLES.at[wildcards.sample, 'Database']
+#TaxaRank = lambda wildcards: SAMPLES.at[wildcards.sample, 'TaxaRank']
+
+#Directories
 DataDirectory = config['DataDir']
 DatabaseDirectory = config ['DatabaseDir']
 ResultsDir = config['ResultsDir'] + config['ExperimentName'] +'/'+config['SampleName']+'/'
@@ -8,9 +16,11 @@ MS2RescoreDir = config['ResultsDir'] + config['ExperimentName'] +'/'+config['Sam
 ResourcesDir = config['ResourcesDir']
 ResultsDirStrain = config['ResultsDir']
 
+#Specific workflow settings
 FilterSpectra = config['FilterSpectra']
 AddHostandCrapToDB = config['AddHostandCrapToDB']
 ExperimentName = config['ExperimentName']
+TaxaRank = config['TaxaRank']
 SpectraFileType = config['SpectraFileType']
 SampleName = config['SampleName']
 ReferenceDBName = config['ReferenceDBName']

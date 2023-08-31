@@ -42,7 +42,7 @@ fig.set_size_inches(30,15)
 ax.barh(range(len(TaxaNames[-args.NumberofResults:])),Scores[-args.NumberofResults:], color='royalblue')
 
 ax.set_yticks(range(len(TaxaNames[-args.NumberofResults:])))
-ax.set_yticklabels(TaxaNames[-args.NumberofResults:], fontsize = 35)
+ax.set_yticklabels(TaxaNames[-args.NumberofResults:], fontsize = 25)
 plt.xlim((0,1))
 plt.xlabel('Posterior probability',fontsize=35)
 ax.xaxis.set_ticks(np.arange(0,1.2,0.2))

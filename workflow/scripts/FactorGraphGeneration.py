@@ -257,9 +257,9 @@ class TaxonGraph(nx.Graph):
     def CreateFromUnipeptResponseCSV(self,CSVpath):
 
         UnipeptResponse = pd.read_csv(CSVpath)
-        newGraph = nx.from_pandas_edgelist(UnipeptResponse, 'sequence', 'taxa')
+        newGraph = nx.from_pandas_edgelist(UnipeptResponse, 'sequence', 'HigherTaxa')
         PeptideAttributes = UnipeptResponse.apply(lambda row: (row["sequence"], {'InitialBelief_0': row["score"],'InitialBelief_1': 1-row['score'],'category':'peptide'}) ,axis=1)
-        TaxaAttributes = UnipeptResponse.apply(lambda row: (row["taxa"], {'category':'taxon'}) ,axis=1)
+        TaxaAttributes = UnipeptResponse.apply(lambda row: (row["HigherTaxa"], {'category':'taxon'}) ,axis=1)
         self.add_edges_from(newGraph.edges)
         self.add_nodes_from(PeptideAttributes)
         self.add_nodes_from(TaxaAttributes)
@@ -484,16 +484,16 @@ def GenerateCTFactorGraphs(ListOfFactorGraphs,GraphType = 'Taxons'):
     return CTFactorgraph
 
 
-if __name__== '__main__':
-    Taxongraph = TaxonGraph()
-    #Taxongraph.GetAllLeafTaxa(['adenoviridae'])
+#if __name__== '__main__':
+#    Taxongraph = TaxonGraph()
+#    #Taxongraph.GetAllLeafTaxa(['adenoviridae'])
     #Taxongraph.FetchTaxonData('peptidemapapth')
-    Taxongraph.CreateFromUnipeptResponseCSV('/home/tholstei/repos/PepGM_all/PepGM/results/Xtandem_rescore_test/PXD018594_Sars_CoV_2/GraphDataframe.csv')
+#    Taxongraph.CreateFromUnipeptResponseCSV('/home/tholstei/repos/PepGM_all/PepGM/results/Xtandem_rescore_test/PXD018594_Sars_CoV_2/GraphDataframe.csv')
     #Taxongraph.CreateExample()
-    Factorgraph = FactorGraph()
-    Factorgraph.ConstructFromTaxonGraph(Taxongraph)
+#    Factorgraph = FactorGraph()
+#    Factorgraph.ConstructFromTaxonGraph(Taxongraph)
 
     #Factorgraphs = Factorgraph.SeparateSubgraphs()
 
-    CTFactorgraphs = GenerateCTFactorGraphs(Factorgraph)
-    CTFactorgraphs.SaveToGraphML('/home/tholstei/repos/PepGM_all/PepGM/graph.graphml')
+ #   CTFactorgraphs = GenerateCTFactorGraphs(Factorgraph)
+  #  CTFactorgraphs.SaveToGraphML('/home/tholstei/repos/PepGM_all/PepGM/graph.graphml')
