@@ -12,13 +12,6 @@ rule AddDecoysCrap:
           DatabaseDirectory+ReferenceDBName+'_UNI_decoy.fasta'
      conda: 'envs/decoy.yml'
      shell: 'decoypyrat {input} -o {output[1]} -d DECOY && cat {input} {output[1]} > {output[0]}'
-
-# check if spectrum should be filtered or not
-def SpectrumToUse(condition):
-     if condition:
-          return ResultsDir+SampleName+'/SpectraFilter/Filtered_'+HostName+SpectraFileType
-     else:
-          return DataDirectory+SampleName+'/'+SampleName+SpectraFileType
           
 #if the spectra aren't beeing filtered, check whether host and crap should be added to the search DB
 def DBToUse(condition):
@@ -27,6 +20,5 @@ def DBToUse(condition):
      else:
         return DatabaseDirectory+ReferenceDBName+'_UNI_concatenated_target_decoy.fasta'
 
-InputSpectrum = SpectrumToUse(FilterSpectra)
 InputDB = DBToUse(AddHostandCrapToDB)
 

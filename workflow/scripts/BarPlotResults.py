@@ -39,7 +39,7 @@ Scores = TaxIDS['score']
 #make the barplot
 fig, ax = plt.subplots()
 fig.set_size_inches(30,15)
-ax.barh(range(len(TaxaNames[-args.NumberofResults:])),Scores[-args.NumberofResults:], color='royalblue')
+bars = ax.barh(range(len(TaxaNames[-args.NumberofResults:])),Scores[-args.NumberofResults:], color='royalblue')
 
 ax.set_yticks(range(len(TaxaNames[-args.NumberofResults:])))
 ax.set_yticklabels(TaxaNames[-args.NumberofResults:], fontsize = 25)
@@ -51,6 +51,19 @@ ax.spines['top'].set_visible(False)
 ax.spines['right'].set_visible(False)
 ax.spines['bottom'].set_visible(False)
 ax.spines['left'].set_visible(False)
+
+bar_color = bars[0].get_facecolor()
+
+for bar in bars:
+  ax.text(
+      bar.get_width() + 0.05,
+      bar.get_y() + bar.get_height() / 5,
+      round(bar.get_width(), 3), fontsize = 35,
+      horizontalalignment='center',
+      color=bar_color,
+      weight='bold'
+  )
+
 
 fig.tight_layout()
         

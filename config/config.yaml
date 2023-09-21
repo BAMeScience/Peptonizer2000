@@ -6,7 +6,7 @@ ResourcesDir: 'resources/'
 
 
 #Name of folder for the Peptonizer run in the results folder
-ExperimentName: 'CAMPI1_SIHUMIx_allbacteria'
+ExperimentName: 'CAMPI1_SIHUMIx_allbacteria_s10'
 TaxaRank: 'species'
 
 FilterSpectra: False
@@ -40,21 +40,26 @@ Mods:
 
 
 #sample specific parameters
-SpectraFileType: '.mgf' #'.mgf' or '.mzML'
-SampleName: 'CAMPI_SIHUMIx'  #needs to be the name of your spectrum file and the folder where you have that file
-ReferenceDBName: 'SIHUMI_DB1UNIPROT'
+#sample specific parameters
+InputSpectra: ['resources/SampleData/ftp.pride.ebi.ac.uk/pride/data/archive/2022/02/PXD023217/S10.mgf',
+              ] #paths to input spectra, should be list, all spectra need to be in the same directory
+SampleName: 'CAMPI_SIHUMIx'  #Name of the sample. Will be the subfolder of your experiment name
+ReferenceDBName: 'SIHUMI_DB1UNIPROT' # reference DB used
+
 
 #UnipeptQueryParameters
-TaxaNumber: 100
+TaxaNumber: 150
 targetTaxa: 2   #comma separated taxa to be included in Unipept query 
 FDR: 0.005
 
 
 #PepGM parameters
-TaxaInPlot: 25     #how many taxa should appear in the final results barplot
+TaxaInPlot: 25      #how many taxa should appear in the final results barplot
 TaxaInProteinCount: 15 #how many taxa should appear in the protein counting barplot
-Alpha: [0.8,0.9] #increments of parameter alpha to use for the grid earch
-Beta: [0.1,0.2,0.4] #range of parameter beta to use for the grid search
-prior: [0.5,0.3]
+Alpha: [0.7,0.8,0.9,0.99] #increments of parameter alpha to use for the grid earch
+Beta: [0.2,0.4,0.5] #range of parameter beta to use for the grid search
+prior: [0.5]
+
+
 
 

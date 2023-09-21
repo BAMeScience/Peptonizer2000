@@ -10,8 +10,10 @@ configfile: 'config/config.yaml'
 #Directories
 DataDirectory = config['DataDir']
 DatabaseDirectory = config ['DatabaseDir']
-ResultsDir = config['ResultsDir'] + config['ExperimentName'] +'/'+config['SampleName']+'/'
-XTandemDir = config['ResultsDir'] + config['ExperimentName'] +'/'+config['SampleName']+'/XTandem/'
+ExperimentDir = config['ResultsDir'] + config['ExperimentName'] 
+ResultsDir = ExperimentDir+'/'+config['SampleName']+'/'
+XTandemDir = ExperimentDir +'/'+config['SampleName']+'/XTandem/'
+ExperimentDir = config['ResultsDir'] + config['ExperimentName']+'/' +config['SampleName']+'/'
 MS2RescoreDir = config['ResultsDir'] + config['ExperimentName'] +'/'+config['SampleName']+'/MS2Rescore/'
 ResourcesDir = config['ResourcesDir']
 ResultsDirStrain = config['ResultsDir']
@@ -21,9 +23,9 @@ FilterSpectra = config['FilterSpectra']
 AddHostandCrapToDB = config['AddHostandCrapToDB']
 ExperimentName = config['ExperimentName']
 TaxaRank = config['TaxaRank']
-SpectraFileType = config['SpectraFileType']
-SampleName = config['SampleName']
+InputSpectra = config['InputSpectra']
 ReferenceDBName = config['ReferenceDBName']
+SampleName = config['SampleName']
 
 
 TaxaInPlot = config['TaxaInPlot']

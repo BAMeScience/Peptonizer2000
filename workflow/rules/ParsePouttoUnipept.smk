@@ -1,7 +1,7 @@
 ###rule for parsing percolator file
 
 rule UnipeptQuery:
-    input: MS2RescoreDir+'rescored_searchengine_ms2pip_rt_features.pout'
+    input: expand(ExperimentDir+'{spectrum_name}/ms2rescore/rescored_searchengine_ms2pip_rt_features.pout',spectrum_name = SpectraNames)
     params: 
           targetTaxa = targetTaxa,
           FDR = FDR

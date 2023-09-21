@@ -4,9 +4,9 @@ def InputMod(name, unimod_accession, mass_shift, amino_acid, n_term, c_term):
     return '{"name":"'+name+'", "unimod_accession":'+str(unimod_accession)+', "mass_shift":'+str(mass_shift)+', "amino_acid":'+str(amino_acid)+', "n_term":'+str(n_term)+', "c_term":'+str(c_term)+'},'
 
 rule createMS2RescoreConfig:
-    input: XTandemOutput
+    input: ExperimentDir+'{spectrum_name}/Xtandem/tandem.output.xml'
     output:
-        MS2RescoreDir+'config.json'
+        ExperimentDir+'{spectrum_name}/ms2rescore/config.json'
     run:
         f_out = open(output[0], "w")
 
@@ -44,13 +44,13 @@ rule createMS2RescoreConfig:
 
 rule RunMS2Rescore:
     input:
-        XTandemOutput,
-        MS2RescoreDir+'config.json', 
-        InputSpectrum 
+        ExperimentDir+'{spectrum_name}/Xtandem/tandem.output.xml',
+        ExperimentDir+'{spectrum_name}/ms2rescore/config.json',
+        SpectraDir+'{spectrum_name}.mgf'
     conda: 'envs/graphenv.yml'
-    log: MS2RescoreDir + 'ms2rescore.log'
-    params: OutputName = MS2RescoreDir+'rescored'
-    output: MS2RescoreDir+'rescored_searchengine_ms2pip_rt_features.pout'
+    log: ExperimentDir+'{spectrum_name}/ms2rescore/ms2rescore.log'
+    params: OutputName = ExperimentDir+'{spectrum_name}/ms2rescore/rescored'
+    output: ExperimentDir+'{spectrum_name}/ms2rescore/rescored_searchengine_ms2pip_rt_features.pout'
     shell: 'cp config/config.yaml '+ResultsDir +' && ms2rescore -c {input[1]} -m {input[2]} {input[0]} -o {params.OutputName}'
 
 
