@@ -25,6 +25,8 @@ ncbi = NCBITaxa()
 #read csv using pandas  
 IDs = pd.read_csv(args.ResultsFile, names = ['ID','score','type'])
 TaxIDS = IDs.loc[IDs['type']=='taxon']
+TaxIDS = TaxIDS.dropna()
+
 TaxIDS.loc[:,'score'] = pd.to_numeric(TaxIDS['score'],downcast = 'float')
 TaxIDS = TaxIDS.sort_values('score')
 TaxaCheck = TaxIDS.ID.tolist()

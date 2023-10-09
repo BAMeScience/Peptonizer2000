@@ -125,6 +125,9 @@ def WeightTaxa(UnipeptResponse, PeptScoreDict, MaxTax, PeptidesPerTaxon, chunks=
     # how conserved a peptide sequence is between taxa.
     # Divide the number of PSMs of a peptide by the number of taxa the peptide is associated with
     UnipeptFrame['weight'] = UnipeptFrame['psms'].div([len(element) for element in UnipeptFrame['taxa']])
+    #if a psms is unique, quadruple is weight
+    mask =[len(element)==1  for element in UnipeptFrame['taxa']]
+    UnipeptFrame['weight'][mask] = UnipeptFrame['weight']*30
     UnipeptFrame = UnipeptFrame.explode('taxa', ignore_index=True)
     
 
@@ -164,10 +167,15 @@ def WeightTaxa(UnipeptResponse, PeptScoreDict, MaxTax, PeptidesPerTaxon, chunks=
     # Filter to taxa with a weight greater than the median weight
     # However, if len > 50, take the top 50 taxa
     TopTaxa = HigherTaxidWeights.loc[HigherTaxidWeights["scaled_weight"] >= HigherTaxidWeights.scaled_weight.median()]
+    
 
+    try:
+        TopTaxa = TopTaxa[TopTaxa.HigherTaxa!=1869227]
+    except:
+        pass
 
     if len(TopTaxa.HigherTaxa) < 50:
-        return UnipeptFrame[UnipeptFrame['HigherTaxa'].isin(TopTaxa.taxa)]
+        return UnipeptFrame[UnipeptFrame['HigherTaxa'].isin(TopTaxa.HigherTaxa)]
     else:
         TopTaxaSorted = TopTaxa.sort_values(by="scaled_weight", ascending=False)
         UnipeptFrame[UnipeptFrame['HigherTaxa'].isin(TopTaxaSorted.HigherTaxa[0:MaxTax])]

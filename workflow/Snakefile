@@ -20,6 +20,7 @@ rule all:
           ResultsDir +'paramcheck.png',
 
 rule CreateFactorGraph:
+     benchmark: ResultsDir +'/benchmark/bench_{DBname}_PepGM_graph.txt'
      input: ResultsDir + 'GraphDataframe.csv'
      output: ResultsDir +'{DBname}_PepGM_graph.graphml'
      conda: 'envs/graphenv.yml'
@@ -32,6 +33,7 @@ rule CreateFactorGraph:
 
 
 rule RunPepGM:
+     benchmark: ResultsDir +'/benchmark/Prior{Prior}/{DBname}_PepGM_Results_a{alpha}_b{beta}_p{Prior}.txt'
      input: ResultsDir +'{DBname}_PepGM_graph.graphml'
      output: ResultsDir +'Prior{Prior}/{DBname}_PepGM_Results_a{alpha}_b{beta}_p{Prior}.csv'
      conda: 'envs/graphenv.yml'
