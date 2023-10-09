@@ -128,16 +128,17 @@ def WeightTaxa(UnipeptResponse, PeptScoreDict, MaxTax, PeptidesPerTaxon, chunks=
     # Divide the number of PSMs of a peptide by the number of taxa the peptide is associated with
     UnipeptFrame['weight'] = UnipeptFrame['psms'].div([len(element) for element in UnipeptFrame['taxa']])
     #if a psms is unique, quadruple is weight
-    #mask =[len(element)==1  for element in UnipeptFrame['taxa']]
-    #UnipeptFrame['weight'][mask] = UnipeptFrame['weight']*30
+    mask =[len(element)==1  for element in UnipeptFrame['taxa']]
+    UniquePSMTaxa = set(i[0] for i in UnipeptFrame['taxa'][mask])
+    print(str(len(UniquePSMTaxa))+' taxa with unique psms were founds, they are \n' + str(UniquePSMTaxa))
     UnipeptFrame = UnipeptFrame.explode('taxa', ignore_index=True)
     
 
 
 
     # Sum up the weights of a taxon and sort by weight
-    TaxIDWeights = UnipeptFrame.groupby('taxa')['weight'].sum().reset_index()
-    TaxIDWeights['log_weight'] = np.log10(UnipeptFrame['weight'])
+    UnipeptFrame['log_weight'] = np.log10(UnipeptFrame['weight']+1)
+    TaxIDWeights = UnipeptFrame.groupby('taxa')['log_weight'].sum().reset_index()
     # Retrieve the proteome size per taxid as a dictionary
     # This file was previously prepared by filtering a generic accession 2 taxid mapping file
     # to swissprot (i.e., reviewed) proteins only
@@ -159,33 +160,31 @@ def WeightTaxa(UnipeptResponse, PeptScoreDict, MaxTax, PeptidesPerTaxon, chunks=
     if SelectRank == True:
         TaxIDWeights['HigherTaxa'] = TaxIDWeights.apply(lambda row: GetLineageAtSpecifiedRank(row['taxa'],TaxaRank), axis = 1)
         UnipeptFrame['HigherTaxa'] = UnipeptFrame.apply(lambda row: GetLineageAtSpecifiedRank(row['taxa'],TaxaRank), axis = 1)
+        HigherUniquePSMtaxids = map(GetLineageAtSpecifiedRank,UniquePSMTaxa,TaxaRank)
+        print(list(HigherUniquePSMtaxids))
   
     
  
     
     #group the duplicate entries of higher up taxa and sum their weights    
     HigherTaxidWeights = TaxIDWeights.groupby('HigherTaxa')['scaled_weight'].sum().reset_index().sort_values(by=['scaled_weight'],
-                                                                                          ascending=False)
-
-    # Filter to taxa with a weight greater than the median weight
-    # However, if len > 50, take the top 50 taxa
-    TopTaxa = HigherTaxidWeights.loc[HigherTaxidWeights["scaled_weight"] >= HigherTaxidWeights.scaled_weight.median()]
-    
+                                                                                          ascending=False)   
 
     try:
-        TopTaxa = TopTaxa[TopTaxa.HigherTaxa!=1869227]
+        HigherTaxidWeights = HigherTaxidWeights[HigherTaxidWeights.HigherTaxa!=1869227]
     except:
         pass
 
-    if len(TopTaxa.HigherTaxa) < 50:
-        return UnipeptFrame[UnipeptFrame['HigherTaxa'].isin(TopTaxa.HigherTaxa)]
+    if len(HigherTaxidWeights.HigherTaxa) < 50:
+        return UnipeptFrame,HigherTaxidWeights
     else:
-        TopTaxaSorted = TopTaxa.sort_values(by="scaled_weight", ascending=False)
-        UnipeptFrame[UnipeptFrame['HigherTaxa'].isin(TopTaxaSorted.HigherTaxa[0:MaxTax])]
-        return UnipeptFrame[UnipeptFrame['HigherTaxa'].isin(TopTaxaSorted.HigherTaxa[0:MaxTax])],HigherTaxidWeights
+        TaxaToInclude = set(UnipeptFrame['HigherTaxa'][0:MaxTax])
+        TaxaToInclude.update(UniquePSMTaxa)
+        UnipeptFrame[UnipeptFrame['HigherTaxa'].isin(TaxaToInclude)]
+        return UnipeptFrame[UnipeptFrame['HigherTaxa'].isin(TaxaToInclude)],HigherTaxidWeights
 
 args = init_argparser()
-Weights,DF = WeightTaxa(args.UnipeptResponseFile, args.UnipeptPeptides, args.NumberOfTaxa, args.PeptidomeSize, TaxaRank = args.TaxaRank)
+DF,Weights = WeightTaxa(args.UnipeptResponseFile, args.UnipeptPeptides, args.NumberOfTaxa, args.PeptidomeSize, TaxaRank = args.TaxaRank)
 DF.to_csv(args.out)
 Weights.to_csv(args.TaxaWeightFile)
 
