@@ -33,11 +33,10 @@ def ComputeMetric(resultsfolder, output, weightsfile):
     Metrics = []
     SumProportions = []
     Entropies = []
-    TaxDistances = []
     WeightCoeffs = []
 
     #file with weights of taxids
-    Weights = pd.read_csv(weightsfile,usecols=['taxa','weight'])
+    Weights = pd.read_csv(weightsfile,usecols=['HigherTaxa','scaled_weight'])
     Weights = Weights.groupby(['taxa']).sum().reset_index()
     Maxweight = Weights.max()['weight']
          
