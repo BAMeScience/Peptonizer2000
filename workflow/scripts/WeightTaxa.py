@@ -1,5 +1,6 @@
 import argparse
 import json
+import numpy as np
 from ete3 import NCBITaxa
 
 import pandas as pd
@@ -21,6 +22,7 @@ def init_argparser():
     parser.add_argument('--UnipeptResponseFile', type=str, required=True, help='path to Unipept response .json file')
     parser.add_argument('--NumberOfTaxa', type=int, required=True, help='number of taxa to include in the output')
     parser.add_argument('--out', type=str, required=True, help='path to csv out file')
+    parser.add_argument('--TaxaWeightFile', type = str, required = True, help='path to taxaweight outputfile')
     parser.add_argument('--UnipeptPeptides', type=str, required=True, help='path to Unipept response .json file')
     parser.add_argument('--PeptidomeSize', type=str, required=True, help='path to proteome size per taxID file')
     parser.add_argument('--TaxaRank',type = str, required = False, default= 'species', help = 'taxonomic rank at which you want the peptonizer results resolved')
@@ -126,16 +128,16 @@ def WeightTaxa(UnipeptResponse, PeptScoreDict, MaxTax, PeptidesPerTaxon, chunks=
     # Divide the number of PSMs of a peptide by the number of taxa the peptide is associated with
     UnipeptFrame['weight'] = UnipeptFrame['psms'].div([len(element) for element in UnipeptFrame['taxa']])
     #if a psms is unique, quadruple is weight
-    mask =[len(element)==1  for element in UnipeptFrame['taxa']]
-    UnipeptFrame['weight'][mask] = UnipeptFrame['weight']*30
+    #mask =[len(element)==1  for element in UnipeptFrame['taxa']]
+    #UnipeptFrame['weight'][mask] = UnipeptFrame['weight']*30
     UnipeptFrame = UnipeptFrame.explode('taxa', ignore_index=True)
     
 
 
 
     # Sum up the weights of a taxon and sort by weight
-    TaxIDWeights = UnipeptFrame.groupby('taxa')['weight'].sum().reset_index().sort_values(by=['weight'],
-                                                                                          ascending=False)
+    TaxIDWeights = UnipeptFrame.groupby('taxa')['weight'].sum().reset_index()
+    TaxIDWeights['log_weight'] = np.log10(UnipeptFrame['weight'])
     # Retrieve the proteome size per taxid as a dictionary
     # This file was previously prepared by filtering a generic accession 2 taxid mapping file
     # to swissprot (i.e., reviewed) proteins only
@@ -148,7 +150,8 @@ def WeightTaxa(UnipeptResponse, PeptScoreDict, MaxTax, PeptidesPerTaxon, chunks=
     # Since large proteomes tend to have more detectable peptides,
     # we adjust the weight by dividing by the size of the proteome i.e.,
     # the number of proteins that are associated with a taxon
-    TaxIDWeights["scaled_weight"] = TaxIDWeights["weight"] / (TaxIDWeights["proteome_size"]) ** N
+    TaxIDWeights["scaled_weight"] = TaxIDWeights["log_weight"] / (TaxIDWeights["proteome_size"]) ** N
+
    
 
     #retrieves the speciefied taxonomic rank taxid in the lineage of each of the species-level taxids returned by Unipept for both the UnipeptFrame 
@@ -179,11 +182,12 @@ def WeightTaxa(UnipeptResponse, PeptScoreDict, MaxTax, PeptidesPerTaxon, chunks=
     else:
         TopTaxaSorted = TopTaxa.sort_values(by="scaled_weight", ascending=False)
         UnipeptFrame[UnipeptFrame['HigherTaxa'].isin(TopTaxaSorted.HigherTaxa[0:MaxTax])]
-        return UnipeptFrame[UnipeptFrame['HigherTaxa'].isin(TopTaxaSorted.HigherTaxa[0:MaxTax])]
+        return UnipeptFrame[UnipeptFrame['HigherTaxa'].isin(TopTaxaSorted.HigherTaxa[0:MaxTax])],HigherTaxidWeights
 
 args = init_argparser()
-DF = WeightTaxa(args.UnipeptResponseFile, args.UnipeptPeptides, args.NumberOfTaxa, args.PeptidomeSize, TaxaRank = args.TaxaRank)
+Weights,DF = WeightTaxa(args.UnipeptResponseFile, args.UnipeptPeptides, args.NumberOfTaxa, args.PeptidomeSize, TaxaRank = args.TaxaRank)
 DF.to_csv(args.out)
+Weights.to_csv(args.TaxaWeightFile)
 
 #if __name__ == '__main__':
     #args = init_argparser()

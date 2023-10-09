@@ -14,7 +14,7 @@ ncbi = NCBITaxa()
 
 
 
-def ComputeMetric(resultsfolder, host, output, weightsfile):
+def ComputeMetric(resultsfolder, output, weightsfile):
 
     """
     Compute a "goodness" metric for the parameters used in the grid search. 
@@ -40,57 +40,32 @@ def ComputeMetric(resultsfolder, host, output, weightsfile):
     Weights = pd.read_csv(weightsfile,usecols=['taxa','weight'])
     Weights = Weights.groupby(['taxa']).sum().reset_index()
     Maxweight = Weights.max()['weight']
-    AllTaxidsToAdd = []
-    #add descendant taxa into weight dataframe
-    for Taxid in Weights['taxa']:
-        TaxidsToAdd = ncbi.get_descendant_taxa(Taxid)
-        TaxidsToAdd = [[txd,float((Weights.loc[Weights['taxa']==Taxid]['weight']).to_string(index=False))]for txd in TaxidsToAdd]
-        AllTaxidsToAdd.append(TaxidsToAdd[:])
-       
-    AllTaxidsToAdd = [txd_1 for txd in AllTaxidsToAdd for txd_1 in txd]
-    AllWeights = pd.concat([Weights, pd.DataFrame(AllTaxidsToAdd,columns = ['taxa','weight'])],axis =0)
-
-        
-
-    
+         
     for folders in os.listdir(resultsfolder):
         if os.path.isdir(resultsfolder+ '/' + folders):
             for file in os.listdir(resultsfolder+ '/' + folders):
     
                 if file.endswith('.csv'):
-    
-                    
-                    HostTaxid = ncbi.get_name_translator([host])[host][0]
-                    HostTaxidList = [str(i) for i in ncbi.get_descendant_taxa(HostTaxid)]+[str(HostTaxid)]
-            
+               
                     Results = pd.read_csv(resultsfolder+ '/' + folders +'/' + file,names = ['ID','score','type'])
                     TaxIDS = Results.loc[Results['type']=='taxon']
                     TaxIDS.loc[:,'score'] = pd.to_numeric(TaxIDS['score'],downcast = 'float')
                     TaxIDS = TaxIDS.sort_values('score', ascending = False)
-                    TaxIDS = TaxIDS[TaxIDS.ID.isin(HostTaxidList)==False]
-                    TaxIDS.drop(TaxIDS[TaxIDS.ID.isin(HostTaxidList)].index, inplace=True)
+
+
                     #compute the metric
                     
-                    #what's the weight of the highest scoring taxid?
-                    Weight = AllWeights.loc[AllWeights['taxa']==int(TaxIDS.ID.head(1).item())]['weight'].head(1).item()
+                    #what's the weight of the highest scoring taxids?
+                    Weight =Weights.loc[Weights['taxa']==int(TaxIDS.ID.head(1).item())]['weight'].head(1).item()
                     WeightCoeff = Weight/Maxweight
                     WeightCoeffs.append(WeightCoeff)
     
-                    #compare the posterior probbilities
-                    FirstSum = np.sum(TaxIDS[:3]['score'])
-                    NextSum = np.sum(TaxIDS[3:8]['score'])
-                    SumProportion = FirstSum/NextSum
-                    SumProportions.append(SumProportion)
-                    Entropy = entropy(TaxIDS[:10]['score'])
+                    #compute entropy of the posterior probability distribution
+                    Entropy = entropy(TaxIDS['score'])
                     Entropies.append(Entropy)
                   
     
-                    #compute the pairwise taxonomic distance of the first 4 Taxa
-                    FourTaxa = np.array(TaxIDS[:4]['ID'])
-                    tree = ncbi.get_topology(FourTaxa)
-                    DistanceSum = (tree.get_distance(FourTaxa[0],FourTaxa[1]))**2+tree.get_distance(FourTaxa[1],FourTaxa[2])+tree.get_distance(FourTaxa[2],FourTaxa[3])
-                    TaxDistances.append(DistanceSum)
-                    Matching = (1/(Entropy))*SumProportion*(1/DistanceSum)*WeightCoeff
+                    Matching = (1/(Entropy))*WeightCoeff
     
                     Metrics.append(Matching)
     

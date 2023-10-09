@@ -24,6 +24,8 @@ rule ParseToUnipeptCSV:
       TaxaRank = TaxaRank
            
     log: ResultsDir + 'ParsetoCSV.log'
-    output: ResultsDir + 'GraphDataframe.csv'
+    output: 
+            ResultsDir + 'GraphDataframe.csv',
+            ResultsDir +'TaxaWeights.csv'
     conda: 'envs/graphenv.yml' 
-    shell: "python3 workflow/scripts/WeightTaxa.py --UnipeptResponseFile {input[0]} --UnipeptPeptides {input[1]} --out {output} --NumberOfTaxa {params.NumberofTaxa} --PeptidomeSize {input[2]} --TaxaRank {params.TaxaRank}" 
+    shell: "python3 workflow/scripts/WeightTaxa.py --UnipeptResponseFile {input[0]} --UnipeptPeptides {input[1]} --out {output[0]} --TaxaWeightFile {output[1]} --NumberOfTaxa {params.NumberofTaxa} --PeptidomeSize {input[2]} --TaxaRank {params.TaxaRank}" 

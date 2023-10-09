@@ -6,7 +6,7 @@ ResourcesDir: 'resources/'
 
 
 #Name of folder for the Peptonizer run in the results folder
-ExperimentName: 'CAMPI1_SIHUMIx_allbacteria_s11_FDR0.1'
+ExperimentName: 'CAMPI1_SIHUMIx_allbacteria_s8_FDR0.1_logweights'
 TaxaRank: 'species'
 
 FilterSpectra: False
@@ -41,10 +41,8 @@ Mods:
 
 #sample specific parameters
 #sample specific parameters
-InputSpectra: ['resources/SampleData/ftp.pride.ebi.ac.uk/pride/data/archive/2022/02/PXD023217/S11_Fraction1.mgf',
-              'resources/SampleData/ftp.pride.ebi.ac.uk/pride/data/archive/2022/02/PXD023217/S11_Fraction2.mgf',
-              'resources/SampleData/ftp.pride.ebi.ac.uk/pride/data/archive/2022/02/PXD023217/S11_Fraction3.mgf',
-              'resources/SampleData/ftp.pride.ebi.ac.uk/pride/data/archive/2022/02/PXD023217/S11_Fraction4.mgf'] #paths to input spectra, should be list, all spectra need to be in the same directory
+InputSpectra: ['resources/SampleData/ftp.pride.ebi.ac.uk/pride/data/archive/2022/02/PXD023217/S08.mgf',
+              ] #paths to input spectra, should be list, all spectra need to be in the same directory
 SampleName: 'CAMPI_SIHUMIx'  #Name of the sample. Will be the subfolder of your experiment name
 ReferenceDBName: 'SIHUMI_DB1UNIPROT' # reference DB used
 
@@ -58,10 +56,9 @@ FDR: 0.01
 #PepGM parameters
 TaxaInPlot: 25      #how many taxa should appear in the final results barplot
 TaxaInProteinCount: 15 #how many taxa should appear in the protein counting barplot
-Alpha: [0.8,0.9,0.99] #increments of parameter alpha to use for the grid earch
-Beta: [0.2,0.4,0.5,0.6] #range of parameter beta to use for the grid search
+Alpha: [0.7,0.8,0.9,0.99] #increments of parameter alpha to use for the grid earch
+Beta: [0.2,0.4,0.5] #range of parameter beta to use for the grid search
 prior: [0.5]
-
 
 
 
