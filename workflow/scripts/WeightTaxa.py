@@ -178,7 +178,7 @@ def WeightTaxa(UnipeptResponse, PeptScoreDict, MaxTax, PeptidesPerTaxon, chunks=
     if len(HigherTaxidWeights.HigherTaxa) < 50:
         return UnipeptFrame,HigherTaxidWeights
     else:
-        TaxaToInclude = set(UnipeptFrame['HigherTaxa'][0:MaxTax])
+        TaxaToInclude = set(HigherTaxidWeights['HigherTaxa'][0:MaxTax])
         TaxaToInclude.update(UniquePSMTaxa)
         UnipeptFrame[UnipeptFrame['HigherTaxa'].isin(TaxaToInclude)]
         return UnipeptFrame[UnipeptFrame['HigherTaxa'].isin(TaxaToInclude)],HigherTaxidWeights
