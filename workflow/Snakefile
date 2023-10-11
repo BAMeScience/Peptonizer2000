@@ -57,7 +57,7 @@ rule FindBestParameters:
      input: ResultsDir +'TaxaWeights.csv',
             expand(ResultsDir + 'Prior{Prior}/'+ ReferenceDBName +'_PepGM_Results_a{alpha}_b{beta}_p{Prior}.png',alpha = AlphaRange, beta = BetaRange, Prior = prior)
      output: ResultsDir +'paramcheck.png', 
-             ResultsDir +'PhyloTreeView.png'
+             #ResultsDir +'PhyloTreeView.png'
      conda: 'envs/graphenv.yml'
      log : ResultsDir +'paramcheck.log'
      params: Results = ResultsDir,

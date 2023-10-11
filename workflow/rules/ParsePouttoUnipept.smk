@@ -1,8 +1,19 @@
 ###rule for parsing percolator file
 
+# check if spectrum should be filtered or not
+def PoutToUse(condition):
+    if condition:
+        return PoutFile
+    else:
+        return expand(ExperimentDir+'{spectrum_name}/ms2rescore/rescored_searchengine_ms2pip_rt_features.pout',spectrum_name = SpectraNames)
+
+InputPoutFile = PoutToUse(Pout)
+print(type(InputPoutFile))
+
 rule UnipeptQuery:
-    input: expand(ExperimentDir+'{spectrum_name}/ms2rescore/rescored_searchengine_ms2pip_rt_features.pout',spectrum_name = SpectraNames)
-    params: 
+    input: 
+          InputPoutFile
+    params:
           targetTaxa = targetTaxa,
           FDR = FDR
     log: ResultsDir + 'UnipeptResponse.log'
@@ -11,6 +22,9 @@ rule UnipeptQuery:
           ResultsDir + 'UnipeptPeptides.json'
     conda: 'envs/Unipeptquery.yml'   
     shell: "python3 workflow/scripts/UnipeptGetTaxonomyfromPout.py --UnipeptResponseFile {output[0]} --pep_out {output[1]} --TaxonomyQuery {params.targetTaxa} --FDR {params.FDR} --PoutFile {input} --logfile {log}" 
+
+
+
 
 rule ParseToUnipeptCSV:
     input: 

@@ -26,7 +26,8 @@ TaxaRank = config['TaxaRank']
 InputSpectra = config['InputSpectra']
 ReferenceDBName = config['ReferenceDBName']
 SampleName = config['SampleName']
-
+Pout = config['StartFromPout']
+PoutFile = config['PoutFile']
 
 TaxaInPlot = config['TaxaInPlot']
 #TaxaInProteinCount = config['TaxaInProteinCount']
