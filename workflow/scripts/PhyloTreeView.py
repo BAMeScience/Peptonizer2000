@@ -9,22 +9,17 @@ This script plots the PepGM results onto a phylogenetic tree using the ete3 tree
 
 ncbi = NCBITaxa()
 
-def CreatePhyloTreeView(resultsfile,host,out):
+def CreatePhyloTreeView(resultsfile,out):
 
     '''
     Plots the PepGM results onto a phylogenetic tree using the ete3 tree visualization tools
     :params resulsfile: str,file with PepGM .csv results
-    :params host: str,host of the virs to be remove from the phylogenetic tree view
     :params out: str, output path
     '''
 
     
     Results = pd.read_csv(resultsfile, names = ['ID','score','type'])
-
-    #remove host taxon from visualization
-    HostTaxid = ncbi.get_name_translator([host])[host][0]
-    HostTaxidList = [str(i) for i in ncbi.get_descendant_taxa(HostTaxid)]+[str(HostTaxid)]
-    
+  
             
     #keep only taxa in dataframe
     TaxIDS = Results.loc[Results['type']=='taxon']
@@ -32,11 +27,10 @@ def CreatePhyloTreeView(resultsfile,host,out):
     TaxIDS.loc[:,'score'] = pd.to_numeric(TaxIDS['score'],downcast = 'float')
     #sort accoring to scores
     TaxIDS = TaxIDS.sort_values('score', ascending = False)
-    TaxIDS.drop(TaxIDS[TaxIDS.ID.isin(HostTaxidList)].index, inplace=True)
-  
+
     
     #put the 15 highest scoring taxids into minimal connecting phylotree
-    phylotree = ncbi.get_topology(TaxIDS.ID.tolist()[:15])
+    phylotree = ncbi.get_topology(TaxIDS.ID.tolist()[:50])
 
     #set score as node weights
     for nodeName in phylotree.iter_leaves():

@@ -6,9 +6,10 @@ import matplotlib
 from matplotlib import pyplot as plt
 from ete3 import NCBITaxa
 from  scipy.stats import entropy
+import rbo
 
 
-#package s ettings
+#package settings
 matplotlib.use('Agg')
 ncbi = NCBITaxa()
 
@@ -31,41 +32,32 @@ def ComputeMetric(resultsfolder, output, weightsfile):
     #predefine necessary lists
     Params = []
     Metrics = []
-    SumProportions = []
     Entropies = []
-    WeightCoeffs = []
-
     #file with weights of taxids
     Weights = pd.read_csv(weightsfile,usecols=['HigherTaxa','scaled_weight'])
-    Weights = Weights.groupby(['taxa']).sum().reset_index()
-    Maxweight = Weights.max()['weight']
          
     for folders in os.listdir(resultsfolder):
         if os.path.isdir(resultsfolder+ '/' + folders):
+            print(folders)
             for file in os.listdir(resultsfolder+ '/' + folders):
+                print(file)
     
                 if file.endswith('.csv'):
                
                     Results = pd.read_csv(resultsfolder+ '/' + folders +'/' + file,names = ['ID','score','type'])
                     TaxIDS = Results.loc[Results['type']=='taxon']
                     TaxIDS.loc[:,'score'] = pd.to_numeric(TaxIDS['score'],downcast = 'float')
-                    TaxIDS = TaxIDS.sort_values('score', ascending = False)
+                    TaxIDS.sort_values('score', ascending = False, inplace= True)
+                    TaxIDS = TaxIDS.dropna()
 
-
-                    #compute the metric
-                    
-                    #what's the weight of the highest scoring taxids?
-                    Weight =Weights.loc[Weights['taxa']==int(TaxIDS.ID.head(1).item())]['weight'].head(1).item()
-                    WeightCoeff = Weight/Maxweight
-                    WeightCoeffs.append(WeightCoeff)
     
                     #compute entropy of the posterior probability distribution
                     Entropy = entropy(TaxIDS['score'])
                     Entropies.append(Entropy)
                   
-    
-                    Matching = (1/(Entropy))*WeightCoeff
-    
+                    #compute the rank based similarity between the weight sorted taxa and the score sorted ID results
+                    Matching = rbo.RankingSimilarity(Weights['HigherTaxa'].values,[int(i) for i in TaxIDS['ID'].values]).rbo()
+                    print(Matching,Weights['HigherTaxa'].values,TaxIDS['ID'].values)
                     Metrics.append(Matching)
     
                     #get the corresponding parameters
@@ -79,13 +71,13 @@ def ComputeMetric(resultsfolder, output, weightsfile):
     tuples = zip(*SortedPairs)
     Metrics,Params = [list(tuple) for tuple in tuples]
     
-    figure1 = plt.figure(figsize=(30,15), tight_layout=True)
+    fig, ax = plt.subplots()
+    fig.set_size_inches(30,15)
     
-    plt.barh(list(range(20)),Metrics[0:20],color = 'mediumvioletred')
+    ax.barh(list(range(len(Metrics))),Metrics,color = 'mediumvioletred')
     plt.xticks(fontsize =35)
-    plt.yticks(list(range(20)),Params[0:20],fontsize=35)
-    
-    print(output)
+    plt.yticks(list(range(len(Metrics))),Params,fontsize=35)
+
     plt.savefig(output)
     plt.close()
 

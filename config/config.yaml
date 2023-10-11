@@ -6,11 +6,14 @@ ResourcesDir: 'resources/'
 
 
 #Name of folder for the Peptonizer run in the results folder
-ExperimentName: 'CAMPI1_SIHUMIx_allbacteria_s8_FDR0.1_logweights'
+ExperimentName: 'CAMPI3_low_complexity'
 TaxaRank: 'species'
 
 FilterSpectra: False
 AddHostandCrapToDB: False
+
+StartFromPout: True
+PoutFile: '/home/tanja/Peptonizer2000/Peptonizer2000/resources/SampleData/CAMPI3/low-complexity-data-20230823T112427Z-001/low-complexity-data/CAMPI3_LowComplexity_mixA_QE2_1D_5ug_180min_RP_25cm-004_searchengine_ms2pip_rt_features.pout' #path to PoutFile. leave empty string if you don not want to start from a poutfile
 
 #xtandem parameters
 search_engine : "xtandem"
@@ -43,8 +46,8 @@ Mods:
 #sample specific parameters
 InputSpectra: ['resources/SampleData/ftp.pride.ebi.ac.uk/pride/data/archive/2022/02/PXD023217/S08.mgf',
               ] #paths to input spectra, should be list, all spectra need to be in the same directory
-SampleName: 'CAMPI_SIHUMIx'  #Name of the sample. Will be the subfolder of your experiment name
-ReferenceDBName: 'SIHUMI_DB1UNIPROT' # reference DB used
+SampleName: 'CAMPI3_MixA'  #Name of the sample. Will be the subfolder of your experiment name
+ReferenceDBName: 'low_complexity' # reference DB used
 
 
 #UnipeptQueryParameters
@@ -59,7 +62,6 @@ TaxaInProteinCount: 15 #how many taxa should appear in the protein counting barp
 Alpha: [0.7,0.8,0.9,0.99] #increments of parameter alpha to use for the grid earch
 Beta: [0.2,0.4,0.5] #range of parameter beta to use for the grid search
 prior: [0.5]
-
 
 
 
