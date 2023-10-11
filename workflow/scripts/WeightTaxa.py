@@ -160,8 +160,7 @@ def WeightTaxa(UnipeptResponse, PeptScoreDict, MaxTax, PeptidesPerTaxon, chunks=
     if SelectRank == True:
         TaxIDWeights['HigherTaxa'] = TaxIDWeights.apply(lambda row: GetLineageAtSpecifiedRank(row['taxa'],TaxaRank), axis = 1)
         UnipeptFrame['HigherTaxa'] = UnipeptFrame.apply(lambda row: GetLineageAtSpecifiedRank(row['taxa'],TaxaRank), axis = 1)
-        HigherUniquePSMtaxids = map(GetLineageAtSpecifiedRank,UniquePSMTaxa,TaxaRank)
-        print(list(HigherUniquePSMtaxids))
+        HigherUniquePSMtaxids = set([GetLineageAtSpecifiedRank(i,TaxaRank) for i in UniquePSMTaxa])
   
     
  
@@ -169,6 +168,7 @@ def WeightTaxa(UnipeptResponse, PeptScoreDict, MaxTax, PeptidesPerTaxon, chunks=
     #group the duplicate entries of higher up taxa and sum their weights    
     HigherTaxidWeights = TaxIDWeights.groupby('HigherTaxa')['scaled_weight'].sum().reset_index().sort_values(by=['scaled_weight'],
                                                                                           ascending=False)   
+    HigherTaxidWeights['Unique'] = np.where(HigherTaxidWeights['HigherTaxa'].isin(HigherUniquePSMtaxids),True,False)
 
     try:
         HigherTaxidWeights = HigherTaxidWeights[HigherTaxidWeights.HigherTaxa!=1869227]
@@ -179,7 +179,7 @@ def WeightTaxa(UnipeptResponse, PeptScoreDict, MaxTax, PeptidesPerTaxon, chunks=
         return UnipeptFrame,HigherTaxidWeights
     else:
         TaxaToInclude = set(HigherTaxidWeights['HigherTaxa'][0:MaxTax])
-        TaxaToInclude.update(UniquePSMTaxa)
+        TaxaToInclude.update(HigherUniquePSMtaxids)
         UnipeptFrame[UnipeptFrame['HigherTaxa'].isin(TaxaToInclude)]
         return UnipeptFrame[UnipeptFrame['HigherTaxa'].isin(TaxaToInclude)],HigherTaxidWeights
 
