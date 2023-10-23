@@ -77,8 +77,8 @@ def ClusterTaxaBasedOnSimilarity(TaxaWeightFile,SimilarityFrame,SimilarityTresho
 
             for taxon2 in WeightSortedTaxa.HigherTaxa:
                 
-                if SimilarityFrame[str(taxon2)][str(taxon1)]>SimilarityTreshold:
-                    check = SimilarityFrame[str(taxon2)][str(taxon1)]
+                if SimilarityFrame[str(int(taxon2))][str(int(taxon1))]>SimilarityTreshold:
+                    check = SimilarityFrame[str(int(taxon2))][str(int(taxon1))]
                     ClusterList.append(taxon2)
                     ListOfWeightSortedTaxa.remove(taxon2)
 
@@ -88,7 +88,7 @@ def ClusterTaxaBasedOnSimilarity(TaxaWeightFile,SimilarityFrame,SimilarityTresho
 
     ClusteredWeighsortedTaxa = WeightSortedTaxa.loc[WeightSortedTaxa.HigherTaxa.isin(Clusterheads)]
     ClusteredWeightsortedTaxa2 = WeightSortedTaxa.loc[WeightSortedTaxa.HigherTaxa.isin([clustertaxa[1:] for clustertaxa in TaxaClusterList])]
-    ClusteredWeighsortedTaxa.concat(ClusteredWeightsortedTaxa2)
+    ClusteredWeighsortedTaxa = pd.concat([ClusteredWeighsortedTaxa,ClusteredWeightsortedTaxa2])
     ClusteredWeighsortedTaxa['Clustermembers'] = TaxaClusterList
 
     return ClusteredWeighsortedTaxa
