@@ -62,3 +62,9 @@ mods = config['Mods']
 TaxaNumber = config['TaxaNumber']
 targetTaxa = config['targetTaxa']
 FDR = config['FDR']
+
+#ParameterEvaluation Parameter
+SimilarityThreshold = config['SimilarityThreshold']
+
+#BiomassContributionPlotting
+PosteriorThreshold = config['PosteriorThreshold']

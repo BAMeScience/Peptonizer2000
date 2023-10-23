@@ -49,8 +49,8 @@ Parameters = ComputeMetric(args.resultsfolder, args.out,args.weights)
 Resultsfile = args.resultsfolder+'/Prior'+str(Parameters[2]) +'/'+ args.reference_db + '_PepGM_Results_a'+str(Parameters[0])+'_b'+str(Parameters[1])+'_p'+str(Parameters[2])
 
 #save the reduced results csv
-SaveReducedCSV(Resultsfile+'.csv', args.resultsfolder +'/PepGm_Results.csv')
-MoveBestResultsPlot(Resultsfile+'.png',args.resultsfolder+'/PepGM_ResultsPlot.png')
+SaveReducedCSV(Resultsfile+'.csv', args.resultsfolder +'/PeptonizerResults.csv')
+MoveBestResultsPlot(Resultsfile+'.png',args.resultsfolder+'/PeptonizerResults.png')
 
 #save a phylogenetic tree view of the PepGm results
 #CreatePhyloTreeView(Resultsfile+'.csv',args.resultsfolder + '/PhyloTreeView.png')

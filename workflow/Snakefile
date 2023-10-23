@@ -59,6 +59,7 @@ rule FindBestParameters:
             ResultsDir + 'ClusterSortedTaxa.csv',
             expand(ResultsDir + 'Prior{Prior}/'+ ReferenceDBName +'_PepGM_Results_a{alpha}_b{beta}_p{Prior}.png',alpha = AlphaRange, beta = BetaRange, Prior = prior)
      output: ResultsDir +'paramcheck.png', 
+             ResultsDir + 'PeptonizerResults.csv'
              #ResultsDir +'PhyloTreeView.png'
      conda: 'envs/graphenv.yml'
      log : ResultsDir +'paramcheck.log'
