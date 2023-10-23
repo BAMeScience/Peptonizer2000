@@ -51,7 +51,7 @@ rule RunMS2Rescore:
     log: ExperimentDir+'{spectrum_name}/ms2rescore/ms2rescore.log'
     params: OutputName = ExperimentDir+'{spectrum_name}/ms2rescore/rescored'
     output: ExperimentDir+'{spectrum_name}/ms2rescore/rescored_searchengine_ms2pip_rt_features.pout'
-    shell: 'cp config/config.yaml '+ResultsDir +' && ms2rescore -c {input[1]} -m {input[2]} {input[0]} -o {params.OutputName}'
+    shell: 'cp config/config.yaml '+ResultsDir +' && ms2rescore -c {input[1]} -m {input[2]} -o {params.OutputName} {input[0]} '
 
 
 

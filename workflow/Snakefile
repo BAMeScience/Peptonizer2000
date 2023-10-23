@@ -11,6 +11,7 @@ include : WorkflowPath + '/rules/CurateDatabase.smk'
 include : WorkflowPath + '/rules/XTandem.smk'
 include : WorkflowPath + '/rules/MS2Rescore.smk'
 include: WorkflowPath + '/rules/ParsePouttoUnipept.smk'
+include: WorkflowPath + '/rules/ClusterTaxa.smk'
 #include: WorkflowPath + '/rules/searchgui+pepshaker.smk'
 
 
@@ -54,7 +55,8 @@ rule BarPlotResults:
 
 
 rule FindBestParameters:
-     input: ResultsDir +'TaxaWeights.csv',
+     input: 
+            ResultsDir + 'ClusterSortedTaxa.csv',
             expand(ResultsDir + 'Prior{Prior}/'+ ReferenceDBName +'_PepGM_Results_a{alpha}_b{beta}_p{Prior}.png',alpha = AlphaRange, beta = BetaRange, Prior = prior)
      output: ResultsDir +'paramcheck.png', 
              #ResultsDir +'PhyloTreeView.png'

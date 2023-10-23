@@ -125,12 +125,10 @@ def WeightTaxa(UnipeptResponse, PeptScoreDict, MaxTax, PeptidesPerTaxon, chunks=
                               pd.json_normalize(UnipeptFrame['sequence'].map(PeptScoreDictload))], axis=1)
     # Score the degeneracy of a taxa, i.e.,
     # how conserved a peptide sequence is between taxa.
-    # Divide the number of PSMs of a peptide by the number of taxa the peptide is associated with
+    # Divide the number of PSMs of a peptide by the number of taxa the peptide is associated with, exponentiated by 3
     UnipeptFrame['weight'] = UnipeptFrame['psms'].div([len(element)**3 for element in UnipeptFrame['taxa']])
-    #if a psms is unique, quadruple is weight
     mask =[len(element)==1  for element in UnipeptFrame['taxa']]
     UniquePSMTaxa = set(i[0] for i in UnipeptFrame['taxa'][mask])
-    print(str(len(UniquePSMTaxa))+' taxa with unique psms were founds, they are \n' + str(UniquePSMTaxa))
     UnipeptFrame = UnipeptFrame.explode('taxa', ignore_index=True)
     
 
