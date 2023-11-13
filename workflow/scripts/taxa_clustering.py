@@ -80,7 +80,9 @@ def ClusterTaxaBasedOnSimilarity(TaxaWeightFile,SimilarityFrame,SimilarityTresho
                 if SimilarityFrame[str(int(taxon2))][str(int(taxon1))]>SimilarityTreshold:
                     check = SimilarityFrame[str(int(taxon2))][str(int(taxon1))]
                     ClusterList.append(taxon2)
-                    ListOfWeightSortedTaxa.remove(taxon2)
+                    if taxon2 in ListOfWeightSortedTaxa:
+                        ListOfWeightSortedTaxa.remove(taxon2)
+                  
 
         
             TaxaClusterList.append(ClusterList)

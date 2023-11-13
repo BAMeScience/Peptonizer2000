@@ -68,6 +68,7 @@ rule CreateXTandemInput:
             lines.append(header_note("output parameters"))
             lines.append(input_note("output, path", params.xtandem_output))
             lines.append(input_note("output, path hashing", "no"))  # no date/time tag in output file name
+            lines.append(input_note("output, results", "all"))  # no FDR filtering
             lines.append(input_note("output, message", ""))
 
             if XTANDEM_PARAS:

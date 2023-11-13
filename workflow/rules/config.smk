@@ -57,6 +57,7 @@ RescoreFeatures = config['RescoreFeatures']
 RunPercolator = config['RunPercolator']
 FragModel = config['FragModel']
 mods = config['Mods']
+SpectrumTitlePattern = config['SpectrumTitlePattern']
 
 #UnipeptQueryParameter
 TaxaNumber = config['TaxaNumber']
