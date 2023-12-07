@@ -6,14 +6,14 @@ ResourcesDir: 'resources/'
 
 
 #Name of folder for the Peptonizer run in the results folder
-ExperimentName: 'CAMPI3_biological_1234_1_FDR1_tim'
+ExperimentName: 'CAMPI1_SIHUMIx_allbacteria_s14'
 TaxaRank: 'species'
 
 FilterSpectra: False
 AddHostandCrapToDB: False
 
-StartFromPout: True
-PoutFile: '/home/tanja/Peptonizer2000/Peptonizer2000/resources/SampleData/ms2rescore_CAMPI3/1234_1_searchengine_ms2pip_rt_features.pout'
+StartFromPout: False
+PoutFile: ''
 
 #xtandem parameters
 search_engine : "xtandem"
@@ -45,14 +45,15 @@ SpectrumTitlePattern: '/([^ ]*[^RT]*?) RT.*/gm' #regex pattern to extract spectr
 
 #sample specific parameters
 #sample specific parameters
-InputSpectra: ['resources/SampleData/ftp.pride.ebi.ac.uk/pride/data/archive/2022/02/PXD023217/S08.mgf',
-              ] #paths to input spectra, should be list, all spectra need to be in the same directory
-SampleName: 'CAMPI_biological'  #Name of the sample. Will be the subfolder of your experiment name
-ReferenceDBName: 'CAMPI3_biological' # reference DB used
+InputSpectra: ['resources/SampleData/ftp.pride.ebi.ac.uk/pride/data/archive/2022/02/PXD023217/S14_Rep1.mgf',
+            'resources/SampleData/ftp.pride.ebi.ac.uk/pride/data/archive/2022/02/PXD023217/S14_Rep2.mgf',
+              'resources/SampleData/ftp.pride.ebi.ac.uk/pride/data/archive/2022/02/PXD023217/S14_Rep3.mgf'] #paths to input spectra, should be list, all spectra need to be in the same directory
+SampleName: 'CAMPI_SIHUMIx'  #Name of the sample. Will be the subfolder of your experiment name
+ReferenceDBName: 'SIHUMI_DB1UNIPROT' # reference DB used
 
 
 #UnipeptQueryParameters
-TaxaNumber: 200
+TaxaNumber: 150
 targetTaxa: 2   #comma separated taxa to be included in Unipept query 
 FDR: 0.01
 
@@ -61,15 +62,14 @@ FDR: 0.01
 TaxaInPlot: 25      #how many taxa should appear in the final results barplot
 TaxaInProteinCount: 15 #how many taxa should appear in the protein counting barplot
 Alpha: [0.7,0.8,0.9,0.99] #increments of parameter alpha to use for the grid earch
-Beta: [0.2,0.4,0.5,0.6,0.7,0.8] #range of parameter beta to use for the grid search
+Beta: [0.2,0.4,0.5,0.6,0.7] #range of parameter beta to use for the grid search
 prior: [0.5]
 
 #ParameterEvaluationParameter
 SimilarityThreshold: 0.9
 
 #Biomasscontribution Parameters
-PosteriorThreshold: 0.8
-
+PosteriorThreshold: 0.9
 
 
 

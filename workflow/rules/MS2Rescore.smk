@@ -20,10 +20,23 @@ rule createMS2RescoreConfig:
         lines.append('"ms2tolerance":'+str(XTANDEM_FMME))
         lines.append('}')
         lines.append('},')
-        lines.append('"psm_id_pattern":"Spectrum_(\\\d+)",')
-        lines.append('"spectrum_id_pattern":"Spectrum_(\\\d+)",')
+        lines.append('"psm_id_pattern":"(Cmpd [\\\d]+, \\\+MS2\\\([\\\d]+\\\.[\\\d]+\\\), [\\\d]+\\\.[\\\d]+eV, [\\\d]+\\\.[\\\d]+min #[\\\d]+)",')
+        lines.append('"spectrum_id_pattern": null ,')
+        lines.append('"modification_mapping":{')
+        lines.append('"+57":"Carbamidomethyl",')
+        lines.append('"+15.99":"Oxidation",')
+        lines.append('"+39.9945":"Pyro-Carbamidomethyl",')
+        lines.append('"-17.0266":"Gln->pyro-Glu",')
+        lines.append('"-18.0106":"Glu->pyro-Glu",')
+        lines.append('"+42.0106":"Acetyl"')
+        lines.append('},')
+        lines.append('"fixed_modifications":{},')
+        lines.append('"processes":16,')
+        lines.append('"rename_to_usi": false,')
+        lines.append('"fasta_file":null,')
+        lines.append('"write_report": false,')
         lines.append('"rescoring_engine":{')
-        lines.append('"mokapot":{')
+        lines.append('"percolator":{')
         lines.append('}},')
         lines.append('"psm_file_type" : "xtandem" ,')
         lines.append('"id_decoy_pattern": "DECOY"')
@@ -41,8 +54,8 @@ rule RunMS2Rescore:
         InputDB
     conda: 'envs/graphenv.yml'
     log: ExperimentDir+'{spectrum_name}/ms2rescore/ms2rescore.log'
-    params: OutputName = ExperimentDir+'{spectrum_name}/ms2rescore/rescored'
-    output: ExperimentDir+'{spectrum_name}/ms2rescore/rescored_searchengine_ms2pip_rt_features.pout'
+    params: OutputName = ExperimentDir+'{spectrum_name}/ms2rescore/rescored/rescored'
+    output: ExperimentDir+'{spectrum_name}/ms2rescore/rescored/rescored.psms.tsv'
     shell: 'cp config/config.yaml '+ResultsDir +' && ms2rescore -c {input[1]} -s {input[2]} -o {params.OutputName} -p {input[0]} -f {input[3]} '
 
 

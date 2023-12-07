@@ -73,6 +73,55 @@ def Poutparser(pout_files, fdr_threshold, decoy_flag):
                 
     return pep_score_psm
 
+def MS2RescoreOutParser(pout_files, fdr_threshold, decoy_flag):
+    '''
+    Parses the ms2rescore pout file for peptides, psm numbers and peptide scores
+    :param pout_file: str, path to pout file(s)
+    :param fdr_threshold: float, fdr threshold below which psms are kept
+    :param decoy_flag: str, can be emtpy string, decoy flag in pout file
+    :return: dict, peptides:[score,#psms]
+    '''
+
+    pep_score = dict()
+    pep_psm = dict()
+    pep_score_psm = dict()
+    
+    for pout_file in pout_files:
+        with open(pout_file, "r") as f:
+            next(f)  # skip header
+            for line in f:
+                # skip empty lines
+                if line.rstrip() == "":
+                    continue
+                splitted_line = line.rstrip().split("\t")[0:8]
+                #assert len(splitted_line) >= 6, "Input file is wrongly formatted. Make sure that the input is a valid .pout file."
+                peptide, psm_id, run, colelction, collection , score, q, pep = splitted_line
+                if float(q) < fdr_threshold:
+                    peptide = re.sub("\[.*?\]", "", peptide)
+                    peptide = peptide.split("/")[0]
+                    # update pep_psm
+                    if peptide not in pep_psm.keys():
+                        pep_psm[peptide] = set()
+                        pep_psm[peptide].add(psm_id)
+                    else:
+                        pep_psm[peptide].add(psm_id)
+                    # update pep_score
+                    if peptide not in pep_score.keys():
+                        if float(pep) <0.001:
+                            pep_score[peptide] = '0.001'
+                        else:
+                            pep_score[peptide] = pep          #adjustement necessary to not have 0 and 1 fuck up probability calculations
+                    else:
+                        if float(pep) <0.001:
+                            pep_score[peptide] = '0.001'
+                        else:
+                            pep_score[peptide] = min(pep,pep_score[peptide])
+                    pep_score_psm[peptide] = [pep_score[peptide],len(pep_psm[peptide])]
+                
+    return pep_score_psm
+
+
+
 def PepListNoMissedCleavages(peptide):
     """
     Takes a peptide and cleaves it into Unipept format (0 missed cleavages,
@@ -219,7 +268,7 @@ async def main(request, out_file, failed_requests_file):
 
 
 
-pep_score_psm = Poutparser(args.PoutFile,args.FDR,'')
+pep_score_psm = MS2RescoreOutParser(args.PoutFile,args.FDR,'')
 UnipeptPeptides = dict()
 for peptide in pep_score_psm.keys():
     FullyTrypticPeptides = PepListNoMissedCleavages(peptide)

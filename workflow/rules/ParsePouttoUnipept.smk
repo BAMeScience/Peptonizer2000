@@ -5,7 +5,7 @@ def PoutToUse(condition):
     if condition:
         return PoutFile
     else:
-        return expand(ExperimentDir+'{spectrum_name}/ms2rescore/rescored_searchengine_ms2pip_rt_features.pout',spectrum_name = SpectraNames)
+        return expand(ExperimentDir+'{spectrum_name}/ms2rescore/rescored/rescored.psms.tsv',spectrum_name = SpectraNames)
 
 InputPoutFile = PoutToUse(Pout)
 print(type(InputPoutFile))

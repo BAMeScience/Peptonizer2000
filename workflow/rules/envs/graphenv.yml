@@ -157,7 +157,7 @@ dependencies:
       - mdurl==0.1.2
       - mokapot==0.10.0
       - ms2pip==4.0.0.dev5
-      - ms2rescore==3.0.0b4
+      - ms2rescore==3.0.0-b5
       - numba==0.55.2
       - numexpr==2.8.1
       - numpy==1.22.4
@@ -170,7 +170,7 @@ dependencies:
       - progressbar2==4.0.0
       - protobuf==3.19.4
       - psims==1.2.8
-      - git+https://github.com/compomics/psm_utils@xtandem-run-fix
+      - psm-utils==0.7.2
       - pyarrow==13.0.0
       - pyasn1==0.4.8
       - pyasn1-modules==0.2.8
