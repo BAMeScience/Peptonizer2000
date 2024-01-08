@@ -108,6 +108,7 @@ The Peptonizer2000 workflow is comprised of the following steps:
 
 * Your raw spectrum file in mgf format
 * A reference database in fasta format <br>
+* A config file with your parameters for X!Tandem and MS2!Rescore and the Unipept query. A more detaile description of the configuration file can be found below. Additoinally, an exemplary config file is porvided in this repository.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -116,16 +117,42 @@ The Peptonizer2000 workflow is comprised of the following steps:
 
 ### Prerequisites
 
-Install PepGM. Find installation instructions [here](https://github.com/BAMeScience/PepGM).
+Make sure you have git installed and clone the repo:
+   ```sh
+   git clone https://github.com/BAMeScience/Peptonizer2000.git
+   ```
+The Peptonizer relies on a snakemake workflow developed with snakemake 5.10.0. <br>
+Installing snakemake requires mamba.
+
+To install mamba:
+  ```sh
+conda install -n <your_env> -c conda-forge mamba
+  ```
+
+To install snakemake:
+```sh
+conda activate <your_env>
+mamba create -c conda-forge -c bioconda -n <your_snakemake_env> snakemake
+```
+In accordance with the Snakemake recommendations, we suggest to save your sample data 
+in `resources` folder. All outputs will be saved in `results`.
+
+Additional dependencies necessary are Java and GCC.
+
+The Peptonizer2000 is tested for Linux OS and uses MS2Rescore developed 
+by the CompOmics group at University of Ghent and X!Tandem as a database search engine.<br>
+
+All necessary binaries are autmatically installed using conda.
+
 
 ### Configuration file
 
-Peptonizer2000 relies on a configuration file in `yaml` format to set up the workflow.
+The Peptonizer2000 relies on a configuration file in `yaml` format to set up the workflow.
 An example configuration file is provided in `config/config.yaml`. <br>
 Do not change the config file location.
 
 <details> 
-   <details > <summary> PepGM parameter </summary>
+   <details > <summary> Peptonizer parameter </summary>
    <ul>
       <li> DataDir:  Relative path to raw spectra </li>
       <li> DatabaseDir: Relative path to database </li>
@@ -143,7 +170,7 @@ Do not change the config file location.
    <ul>
       <li> SpectraFileType: mgf or mzML </li>
       <li> SampleName: wildcard for spectra file and folder name </li>
-      <li> ReferenceDBName: wildvard for reference database name </li>
+      <li> ReferenceDBName: wildcard for reference database name </li>
    </ul>
    </details>
 
@@ -184,7 +211,7 @@ Do not change the config file location.
    <details > <summary> UniPept parameter </summary>
    <ul>
        <li>TaxaNumber: # of taxa </li>
-       <li>targetTaxa: Comma separated list of taxa compromises the UniPept query</li>
+       <li>targetTaxa: Comma separated list of taxa compromised in the UniPept query. If querying all of Unipept, use '1'</li>
        <li>FDR: FDR level, decimal</li>
    </ul> 
    </details>

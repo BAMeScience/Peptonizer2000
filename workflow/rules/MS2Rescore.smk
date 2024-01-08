@@ -20,7 +20,7 @@ rule createMS2RescoreConfig:
         lines.append('"ms2tolerance":'+str(XTANDEM_FMME))
         lines.append('}')
         lines.append('},')
-        lines.append('"psm_id_pattern":"('+SpectrumTitlePattern+')",')
+        lines.append('"psm_id_pattern":"'+SpectrumTitlePattern+'",')
         lines.append('"spectrum_id_pattern": null ,')
         lines.append('"modification_mapping":{')
         lines.append('"+57":"Carbamidomethyl",')

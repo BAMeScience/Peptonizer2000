@@ -213,7 +213,7 @@ def PostInfoFromUnipeptChunks(request_json, out_file, failed_requests_file):
 async def fetch_data(session, url, json_input, out_file, failed_requests,i,total_chunks):
     try:
         
-        async with session.post(url, json = json_input, timeout=6600,headers={'content-type':'application/json'}) as response:
+        async with session.post(url, json = json_input, timeout=8600,headers={'content-type':'application/json'}) as response:
             response.raise_for_status()
             result = await response.text()
             with open(out_file, 'a') as f_out:
