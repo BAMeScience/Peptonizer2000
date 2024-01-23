@@ -8,6 +8,7 @@ import logging
 import time
 import asyncio
 import aiohttp
+import aiofiles
 import sys
 
 ncbi = NCBITaxa()
@@ -209,63 +210,108 @@ def PostInfoFromUnipeptChunks(request_json, out_file, failed_requests_file):
 
 
 
-#Functions for parallel asynchornous Unipept requests
-async def fetch_data(session, url, json_input, out_file, failed_requests,i,total_chunks):
-    try:
+# #Functions for parallel asynchornous Unipept requests
+# async def fetch_data(session, url, json_input, out_file, failed_requests,i,total_chunks):
+#     try:
         
-        async with session.post(url, json = json_input, timeout=8600,headers={'content-type':'application/json'}) as response:
+#         async with session.post(url, json = json_input, timeout=8600,headers={'content-type':'application/json'}) as response:
+#             response.raise_for_status()
+#             result = await response.text()
+#             with open(out_file, 'a') as f_out:
+#                 print(result, file=f_out)
+#             print('successfully queried chunk ' + str(i) + ' out of ' +str(total_chunks))
+#             return True
+        
+#     except aiohttp.ClientError as e:
+#         print('failed to query chunk ' +str(i))
+#         time.sleep(30)
+#         logging.error(f'Request to {url} failed with error: {e}')
+#         failed_requests.append((json_input, e))
+#         return False
+
+# async def limited_gather(semaphore, session, url, chunks, out_file, failed_requests,i,total_chunks):
+#     async with semaphore:
+#         return await fetch_data(session,url,chunks,out_file,failed_requests,i,total_chunks)
+
+
+ 
+# async def main(request, out_file, failed_requests_file):
+#     logging.basicConfig(filename=failed_requests_file, level=logging.INFO)
+#     url = 'http://api.unipept.ugent.be/mpa/pept2filtered'
+#     print('now querying Unipept in ' + str(len(request)) + ' chunks')
+
+#     semaphore = asyncio.Semaphore(3)  # Limit the number of concurrent requests to three
+
+#     total_chunks = len(request)
+
+#     async with aiohttp.ClientSession() as session:
+#         failed_requests = []
+ 
+
+#         limited_gather_tasks = []
+#         i = 0
+#         for chunk in request:
+#            task = limited_gather(semaphore, session, url, chunk, out_file, failed_requests,i,total_chunks)
+#            limited_gather_tasks.append(task)
+#            i += 1
+
+#         await asyncio.gather(*limited_gather_tasks)
+
+#         # Retry failed requests
+#         retry_tasks = []
+#         for chunk, error in failed_requests:
+#             task = limited_gather(semaphore,session, url, chunk, out_file, [],i,total_chunks)
+#             retry_tasks.append(task)
+
+#         await asyncio.gather(*retry_tasks)
+
+async def fetch_data(session, url, json_input, out_file, failed_requests, i, total_chunks):
+    try:
+        async with session.post(url, json=json_input, timeout=8600, headers={'content-type': 'application/json'}) as response:
             response.raise_for_status()
             result = await response.text()
-            with open(out_file, 'a') as f_out:
-                print(result, file=f_out)
-            print('successfully queried chunk ' + str(i) + ' out of ' +str(total_chunks))
+            async with aiofiles.open(out_file, 'a') as f_out:
+                await f_out.write(result + '\n')
+            print(f'Successfully queried chunk {i} out of {total_chunks}')
             return True
-        
-    except aiohttp.ClientError as e:
-        print('failed to query chunk ' +str(i))
-        time.sleep(30)
+    except (aiohttp.ClientError,aiohttp.ClientConnectionError, asyncio.TimeoutError) as e:
+        print(f'Failed to query chunk {i}')
         logging.error(f'Request to {url} failed with error: {e}')
         failed_requests.append((json_input, e))
         return False
 
-async def limited_gather(semaphore, session, url, chunks, out_file, failed_requests,i,total_chunks):
+async def limited_gather(semaphore, session, url, chunks, out_file, failed_requests, i, total_chunks):
     async with semaphore:
-        return await fetch_data(session,url,chunks,out_file,failed_requests,i,total_chunks)
+        return await fetch_data(session, url, chunks, out_file, failed_requests, i, total_chunks)
 
-
- 
 async def main(request, out_file, failed_requests_file):
     logging.basicConfig(filename=failed_requests_file, level=logging.INFO)
     url = 'http://api.unipept.ugent.be/mpa/pept2filtered'
-    print('now querying Unipept in ' + str(len(request)) + ' chunks')
+    print(f'Now querying Unipept in {len(request)} chunks')
 
     semaphore = asyncio.Semaphore(3)  # Limit the number of concurrent requests to three
 
     total_chunks = len(request)
+    failed_requests = []
 
     async with aiohttp.ClientSession() as session:
-        failed_requests = []
- 
-
         limited_gather_tasks = []
-        i = 0
-        for chunk in request:
-           task = limited_gather(semaphore, session, url, chunk, out_file, failed_requests,i,total_chunks)
-           limited_gather_tasks.append(task)
-           i += 1
+        for i, chunk in enumerate(request):
+            task = limited_gather(semaphore, session, url, chunk, out_file, failed_requests, i, total_chunks)
+            limited_gather_tasks.append(task)
 
         await asyncio.gather(*limited_gather_tasks)
 
-        # Retry failed requests
-        retry_tasks = []
-        for chunk, error in failed_requests:
-            task = limited_gather(semaphore,session, url, chunk, out_file, [],i,total_chunks)
-            retry_tasks.append(task)
+        # Retry failed requests with exponential backoff
+        for retry in range(3):  # Retry a maximum of 3 times
+            retry_tasks = []
+            for chunk, e in failed_requests:
+                logging.error(f'Request {chunk} try 2 to {url} failed with error: {e}')
+                task = limited_gather(semaphore, session, url, chunk, out_file, failed_requests, i, total_chunks)
+                retry_tasks.append(task)
 
-        await asyncio.gather(*retry_tasks)
-
-
-
+            await asyncio.gather(*retry_tasks)
+            await asyncio.sleep(2 ** retry)  # Exponential backoff
 
 
 pep_score_psm = MS2RescoreOutParser(args.PoutFile,args.FDR,'')

@@ -6,6 +6,7 @@ dependencies:
   - python == 3.11
   - requests
   - aiohttp
+  - aiofiles
   - ete3
 
 prefix: /home/tholstei/anaconda3/envs/install_env/envs/Unipeptquery
