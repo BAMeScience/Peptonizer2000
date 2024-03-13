@@ -20,6 +20,11 @@ def lognormalize(Array):
     y = np.exp(Array - b)
     return y / y.sum()
 
+#replace 0 values to avoid numerical underflow/ invalid value warnings in logs
+def replace_zeros(Array):
+    Array[Array == 0] = 1e-50
+    return Array
+
 
 
 #implementation of the convolution tree according to serang    
@@ -230,8 +235,8 @@ class Messages():
 
          else:
              #need for logs to prevent underflow in very large multiplications
-             IncomingMessages = np.asarray(np.log(IncomingMessages)).reshape(len(IncomingMessages),2)
-             OutMessageLog = lognormalize(np.asarray([np.sum([np.log(NodeBelief[0]),np.sum(IncomingMessages[:,0])]),np.sum([np.log(NodeBelief[1]),np.sum(IncomingMessages[:,1])])]))
+             IncomingMessages = np.asarray(np.log(replace_zeros(IncomingMessages))).reshape(len(IncomingMessages),2)
+             OutMessageLog = lognormalize(np.asarray([np.sum([np.log(replace_zeros(NodeBelief[0])),np.sum(IncomingMessages[:,0])]),np.sum([np.log(replace_zeros(NodeBelief[1])),np.sum(IncomingMessages[:,1])])]))
              if np.isnan(np.sum(OutMessageLog))==True:
                 stoppoint = 3
              return OutMessageLog
@@ -258,8 +263,8 @@ class Messages():
          if self.Graph.nodes[NodeIN]['category'] == 'Convolution Tree':
                 #handles empty & messages with only one value
                 IncomingMessages.append([1.,1.]) 
-                IncomingMessages = np.asarray(np.log(IncomingMessages)).reshape(len(IncomingMessages),2)#np.asarray(IncomingMessages).reshape(len(IncomingMessages),2)
-                OutMessages = lognormalize(np.add(np.log(NodeBelief),[np.sum(IncomingMessages[:,0]),np.sum(IncomingMessages[:,1])]))#normalize(np.multiply(NodeBelief,[np.prod(IncomingMessages[:,0]),np.prod(IncomingMessages[:,1])]))
+                IncomingMessages = np.asarray(np.log(replace_zeros(IncomingMessages))).reshape(len(IncomingMessages),2)#np.asarray(IncomingMessages).reshape(len(IncomingMessages),2)
+                OutMessages = lognormalize(np.add(np.log(replace_zeros(NodeBelief)),[np.sum(IncomingMessages[:,0]),np.sum(IncomingMessages[:,1])]))#normalize(np.multiply(NodeBelief,[np.prod(IncomingMessages[:,0]),np.prod(IncomingMessages[:,1])]))
                 #self.CurrentBeliefsNew[NodeOUT] = OutMessages
                 
             
@@ -267,7 +272,7 @@ class Messages():
          else:
                 if  np.asarray(IncomingMessages[0]).shape[0] > 2:
                     #log domain to avoid underflow
-                    IncomingMessages = np.asarray(np.log(IncomingMessages)).reshape(IncomingMessages[0].shape[0],1)
+                    IncomingMessages = np.asarray(np.log(replace_zeros(IncomingMessages))).reshape(IncomingMessages[0].shape[0],1)
                     OutMessages = lognormalize(NodeBelief*IncomingMessages)
                     return [np.sum(OutMessages[0,:]),np.sum(OutMessages[1,:])] 
                 else :
@@ -462,7 +467,7 @@ class Messages():
                 
                 #log to avoid overflow
                 IncomingMessages = np.asarray(np.log(IncomingMessages)).reshape(len(IncomingMessages),2)
-                LoggedVariableMarginal = lognormalize(np.asarray([np.sum([np.log(self.InitialBeliefs[Variable][0]),np.sum(IncomingMessages[:,0])]),np.sum([np.log(self.InitialBeliefs[Variable][1]),np.sum(IncomingMessages[:,1])])]))
+                LoggedVariableMarginal = lognormalize(np.asarray([np.sum([np.log(replace_zeros(self.InitialBeliefs[Variable][0])),np.sum(IncomingMessages[:,0])]),np.sum([np.log(replace_zeros(self.InitialBeliefs[Variable][1])),np.sum(IncomingMessages[:,1])])]))
 
                 self.CurrentBeliefs[Variable] = LoggedVariableMarginal
 

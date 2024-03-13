@@ -8,7 +8,7 @@ def PoutToUse(condition):
         return expand(ExperimentDir+'{spectrum_name}/ms2rescore/rescored/rescored.psms.tsv',spectrum_name = SpectraNames)
 
 InputPoutFile = PoutToUse(Pout)
-print(type(InputPoutFile))
+#print(type(InputPoutFile))
 
 rule UnipeptQuery:
     input: 
@@ -30,7 +30,7 @@ rule ParseToUnipeptCSV:
     input: 
           ResultsDir + 'UnipeptResponse.json',
           ResultsDir + 'UnipeptPeptides.json',
-          ResourcesDir + 'taxa_peptidome_size.tsv'
+          #ResourcesDir + 'taxa_peptidome_size.tsv'
           
           
     params: 
@@ -42,4 +42,4 @@ rule ParseToUnipeptCSV:
             ResultsDir + 'GraphDataframe.csv',
             ResultsDir +'TaxaWeights.csv'
     conda: 'envs/graphenv.yml' 
-    shell: "python3 workflow/scripts/WeightTaxa.py --UnipeptResponseFile {input[0]} --UnipeptPeptides {input[1]} --out {output[0]} --TaxaWeightFile {output[1]} --NumberOfTaxa {params.NumberofTaxa} --PeptidomeSize {input[2]} --TaxaRank {params.TaxaRank}" 
+    shell: "python3 workflow/scripts/WeightTaxa.py --UnipeptResponseFile {input[0]} --UnipeptPeptides {input[1]} --out {output[0]} --TaxaWeightFile {output[1]} --NumberOfTaxa {params.NumberofTaxa} --TaxaRank {params.TaxaRank}" 

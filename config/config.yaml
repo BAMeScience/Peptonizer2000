@@ -18,14 +18,14 @@ PoutFile: ''
 #xtandem parameters
 search_engine : "xtandem"
 xtandem_default: "/home/tanja/Peptonizer2000/Peptonizer2000/resources/XTandem/xtandem_default.xml" # X!Tandem default configuration file
-xtandem_fmme: 0.1 #Fragment mass tolerance (default=0.4)
+xtandem_fmme: 0.02 #Fragment mass tolerance (default=0.4)
 xtandem_fmmeu: 'DA' #Fragment mass tolerance unit (default="DA")
 xtandem_pmmep: 10 #Precursor mass tolerance plus (default=100)
 xtandem_pmmem: 10 # Precursor mass tolerance minus (default=100)
 xtandem_pmmeu: 'ppm' #Precursor mass tolerance unit (default="ppm")
-xtandem_mods_fixed: '' #Fixed modifications, comma separated (default="57@C")
-xtandem_mods_variable: '15.99@M,57.02@C' # Variable modifications, e.g. "16@M", comma separated (default=None)
-xtandem_mods_variable_nterm: '+42.0@[' #Variable N-terminal modifications, e.g."+42.0@[", comma separated (default=None)
+xtandem_mods_fixed: '57@C' #Fixed modifications, comma separated (default="57@C")
+xtandem_mods_variable: '15.99@M,' # Variable modifications, e.g. "16@M", comma separated (default=None)
+xtandem_mods_variable_nterm: '' #Variable N-terminal modifications, e.g."+42.0@[", comma separated (default=None)
 xtandem_add_params: {} #Additional parameters for X!Tandem as json dictionary{"param1" : "value", "param2" : "value", ...} which will be added to thextandem_input.xml
 
 #ms2rescore parameters
@@ -45,10 +45,10 @@ SpectrumTitlePattern: '(controllerType=[\\d]+ controllerNumber=[\\d]+ scan=[\\d]
 
 #sample specific parameters
 #sample specific parameters
-InputSpectra: ['/home/tanja/Peptonizer2000/Peptonizer2000/resources/SampleData/Kleiner_PXD006118/ftp.pride.ebi.ac.uk/pride/data/archive/2017/05/PXD006118/Run1_U1_2000ng.mgf',
-              '/home/tanja/Peptonizer2000/Peptonizer2000/resources/SampleData/Kleiner_PXD006118/ftp.pride.ebi.ac.uk/pride/data/archive/2017/05/PXD006118/Run2_U1_2000ng.mgf'] #paths to input spectra, should be list, all spectra need to be in the same directory
-SampleName: 'Kleiner_U1_run1_and_2'  #Name of the sample. Will be the subfolder of your experiment name
-ReferenceDBName: 'Mock_Comm_RefDB_V3' # reference DB used
+InputSpectra: ['resources/SampleData/ftp.pride.ebi.ac.uk/pride/data/archive/2022/02/PXD023217/S08.mgf',
+              ] #paths to input spectra, should be list, all spectra need to be in the same directory
+SampleName: 'CAMPI_SIHUMIx'  #Name of the sample. Will be the subfolder of your experiment name
+ReferenceDBName: 'SIHUMI_DB1UNIPROT' # reference DB used
 
 
 #UnipeptQueryParameters
@@ -58,10 +58,11 @@ FDR: 0.01
 
 
 #PepGM parameters
+#PepGM parameters
 TaxaInPlot: 25      #how many taxa should appear in the final results barplot
 TaxaInProteinCount: 15 #how many taxa should appear in the protein counting barplot
-Alpha: [0.7,0.8,0.9,0.99] #increments of parameter alpha to use for the grid earch
-Beta: [0.4,0.5,0.6,0.7] #range of parameter beta to use for the grid search
+Alpha: [0.7,0.8]#,0.9,0.99] #increments of parameter alpha to use for the grid earch
+Beta: [0.3,0.4]#,0.5,0.6,0.7] #range of parameter beta to use for the grid search
 prior: [0.5]
 
 #ParameterEvaluationParameter
@@ -69,6 +70,7 @@ SimilarityThreshold: 0.9
 
 #Biomasscontribution Parameters
 PosteriorThreshold: 0.9
+
 
 
 

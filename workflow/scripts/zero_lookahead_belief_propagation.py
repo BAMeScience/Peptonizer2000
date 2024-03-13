@@ -7,8 +7,12 @@ import math
 from scipy.signal import fftconvolve
 import pandas as pd
 from FactorGraphGeneration import *
+from scipy.special import logsumexp
 
 import time
+
+#set numpy to raise errors
+#np.seterr(all='raise')
 
 def normalize(Array):
     normalizedArray = Array/np.sum(Array)
@@ -16,11 +20,17 @@ def normalize(Array):
 
 #normalization of log propabilities
 def lognormalize(Array):
-    b = Array.max()
-    y = np.exp(Array - b)
-    return y / y.sum()
+    try:
+        y = np.exp(Array - logsumexp(Array))
+        
+    except FloatingPointError:
+        print(Array)
+        y = np.exp(Array - logsumexp(Array))
+    return y 
 
-
+def Avoidunderflow(Array):
+    Array[Array<1e-30] = 1e-30
+    return Array
 
 #implementation of the convolution tree according to serang    
 # not written by me!!          
@@ -275,7 +285,10 @@ class Messages():
                 if  np.asarray(IncomingMessages[0]).shape[0] > 2:
                     IncomingMessagesShaped = np.asarray(IncomingMessages).reshape(IncomingMessages[0].shape[0],1)
                     #OutMessages = normalize(NodeBelief*IncomingMessagesShaped)
+
                     IncomingMessagesLog = np.log(np.asarray(IncomingMessages).reshape(IncomingMessages[0].shape[0],1))
+                    #catch warning for log(0)
+
                     LogBelief = np.log(NodeBelief)
                     OutMessagesLog = lognormalize(np.add(LogBelief,IncomingMessagesLog))
                     #if not np.all([np.sum(OutMessages[0,:]),np.sum(OutMessages[1,:])]):
@@ -318,8 +331,11 @@ class Messages():
                 ProtList.append(NodesIN)
             else:
                 peptides.append(NodesIN)
-                sharedLikelihoods = np.multiply(sharedLikelihoods,self.Msg[NodesIN,Node])
-                OldSharedLikelihoods = np.multiply(sharedLikelihoods,self.MsgLog[NodesIN,Node])
+                try:
+                    sharedLikelihoods = np.multiply(Avoidunderflow(sharedLikelihoods),self.Msg[NodesIN,Node])
+                except:
+                    print(sharedLikelihoods,self.Msg[NodesIN,Node])
+                OldSharedLikelihoods = np.multiply(Avoidunderflow(sharedLikelihoods),self.MsgLog[NodesIN,Node])
         
         if all(OldSharedLikelihoods != sharedLikelihoods) and any([(ProtProbList[i][0]) != (OldProtProbList[i][0])for i in range(len(ProtProbList))]):
         #only update when the shared likelihhods or at least on of the protein messages has changed
@@ -334,7 +350,7 @@ class Messages():
             for pep in peptides:
              self.MsgNew[Node,pep] = CT.MessageToSharedLikelihood()
              if not np.all(self.MsgNew[Node,pep]):
-                 self.MsgNew[Node,pep][self.MsgNew[Node,pep]==0] = 1e-30
+                 self.MsgNew[Node,pep][self.MsgNew[Node,pep]<1e-30] = 1e-30
                  stopp = 5
 
         
@@ -376,11 +392,11 @@ class Messages():
         Msg2 = self.MsgLog[StartName,EndName]
         if len(self.MsgLog[StartName,EndName]) != len(self.Msg[StartName,EndName]):
             Msg2 = [1]*len(self.Msg[StartName,EndName])
-        check = np.max(np.abs(np.log(np.divide(Msg1,Msg2)))) 
+        check = np.max(np.abs(np.log(np.divide(Msg1,Msg2))))
         pos = 0
         for i in Msg1:
-            if i == 0:
-                Msg1[pos] == 1e-40
+            if i < 1e-30:
+                Msg1[pos] == 1e-30
             pos += 1
                 
         return np.max(np.abs(np.log(np.divide(Msg1,Msg2)))) 
