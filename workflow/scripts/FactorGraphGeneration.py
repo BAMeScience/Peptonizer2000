@@ -454,8 +454,9 @@ class CTFactorGraph(FactorGraph):
                 #pre-define the CPD array and fill it with the noisyOR values
                 cpdArray = np.full([2,degree+1],1-alpha)         
                 ExponentArray = np.arange(0,degree+1)
-                cpdArray[0,:] = np.power(cpdArray[0,:],ExponentArray)*(1-beta)
-                cpdArray[1,:] = np.add(-cpdArray[0,:],1)
+                #reularize cpd priors to penalize higher number of parents
+                cpdArray[0,:] = np.divide(np.power(cpdArray[0,:],ExponentArray)*(1-beta),ExponentArray)
+                cpdArray[1,:] = np.divide(np.add(-cpdArray[0,:],1),ExponentArray)
                 cpdArray = np.transpose(normalize(cpdArray))
 
                 FactorToAdd = Factor(cpdArray,['placeholder',[node[0]+'0',node[0]+'1']])

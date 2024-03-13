@@ -6,7 +6,7 @@ ResourcesDir: 'resources/'
 
 
 #Name of folder for the Peptonizer run in the results folder
-ExperimentName: 'Kleiner_U1_run1_and_2'
+ExperimentName: 'CAMPI1_SIHUMIx_allbacteria_s8_root_new_rescore'
 TaxaRank: 'species'
 
 FilterSpectra: False
@@ -61,8 +61,8 @@ FDR: 0.01
 #PepGM parameters
 TaxaInPlot: 25      #how many taxa should appear in the final results barplot
 TaxaInProteinCount: 15 #how many taxa should appear in the protein counting barplot
-Alpha: [0.7,0.8]#,0.9,0.99] #increments of parameter alpha to use for the grid earch
-Beta: [0.3,0.4]#,0.5,0.6,0.7] #range of parameter beta to use for the grid search
+Alpha: [0.7,0.8,0.9,0.99] #increments of parameter alpha to use for the grid earch
+Beta: [0.3,0.4,0.5,0.6,0.7] #range of parameter beta to use for the grid search
 prior: [0.5]
 
 #ParameterEvaluationParameter
