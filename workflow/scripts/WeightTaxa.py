@@ -24,7 +24,7 @@ def init_argparser():
     parser.add_argument('--out', type=str, required=True, help='path to csv out file')
     parser.add_argument('--TaxaWeightFile', type = str, required = False, help='path to taxaweight outputfile')
     parser.add_argument('--UnipeptPeptides', type=str, required=True, help='path to Unipept response .json file')
-    parser.add_argument('--PeptidomeSize', type=str, required=True, help='path to proteome size per taxID file')
+    parser.add_argument('--PeptidomeSize', type=str, required=False, help='path to proteome size per taxID file')
     parser.add_argument('--TaxaRank',type = str, required = False, default= 'species', help = 'taxonomic rank at which you want the peptonizer results resolved')
 
     args = parser.parse_args()
@@ -74,7 +74,7 @@ def GetLineageAtSpecifiedRank(taxid, TaxaRank):
 
 
 
-def WeightTaxa(UnipeptResponse, PeptScoreDict, MaxTax, PeptidesPerTaxon, chunks=True, N=0, SelectRank = True, TaxaRank = 'species'):
+def WeightTaxa(UnipeptResponse, PeptScoreDict, MaxTax,*PeptidesPerTaxon, chunks=True, N=0, SelectRank = True, TaxaRank = 'species'):
     """
     Weight inferred taxa based on their (1) degeneracy and (2) their proteome size.
     Parameters

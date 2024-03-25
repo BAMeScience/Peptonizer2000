@@ -76,7 +76,7 @@ def ComputeMetric(resultsfolder, output, weightsfile):
     
     ax.barh(list(range(len(Metrics))),Metrics,color = 'mediumvioletred')
     plt.xticks(fontsize =35)
-    plt.yticks(list(range(len(Metrics))),Params,fontsize=35)
+    plt.yticks(list(range(len(Metrics))),Params,fontsize=25)
 
     plt.savefig(output)
     plt.close()

@@ -29,6 +29,10 @@ def normalize(Array):
     normalizedArray = Array/np.sum(Array)
     return normalizedArray
 
+def Avoidunderflow(Array):
+    Array[Array<1e-30] = 1e-30
+    return Array
+
 class ProteinPeptideGraph(nx.Graph):
     
     #class for stroing the protein-peptide graph with scores and priors but no factors, e.g for visual representation
@@ -452,14 +456,21 @@ class CTFactorGraph(FactorGraph):
                 # add noisyOR factors
                 degree = node[1]['ParentNumber']
                 #pre-define the CPD array and fill it with the noisyOR values
-                cpdArray = np.full([2,degree+1],1-alpha)         
+                cpdArray = np.full([2,degree+1],1-alpha) 
+                cpdArray_regularized = np.full([2,degree+1],1-alpha)         
                 ExponentArray = np.arange(0,degree+1)
-                #reularize cpd priors to penalize higher number of parents
-                cpdArray[0,:] = np.divide(np.power(cpdArray[0,:],ExponentArray)*(1-beta),ExponentArray)
-                cpdArray[1,:] = np.divide(np.add(-cpdArray[0,:],1),ExponentArray)
+                divideArray = np.concatenate((np.asarray([1]),np.arange(1,degree+1)))
+                #regularize cpd priors to penalize higher number of parents
+                #log domain to avoid underflow
+                cpdArray[0,:] = np.power(cpdArray[0,:],ExponentArray)*(1-beta)
+                cpdArray_regularized[0,:] = np.divide(np.power(cpdArray[0,:],ExponentArray)*(1-beta),divideArray)
+                #check0 = cpdArray_regularized[0,:]
+                #check1 = cpdArray[0,:]
+                cpdArray[1,:] = np.add(-cpdArray[0,:],1)
+                cpdArray_regularized[1,:] = np.add(-cpdArray_regularized[0,:],1)
                 cpdArray = np.transpose(normalize(cpdArray))
-
-                FactorToAdd = Factor(cpdArray,['placeholder',[node[0]+'0',node[0]+'1']])
+                cpdArray_regularized = Avoidunderflow(np.transpose(normalize(cpdArray_regularized)))
+                FactorToAdd = Factor(cpdArray_regularized,['placeholder',[node[0]+'0',node[0]+'1']])
                
                 #add factor & its edges to network as an extra node  
                 nx.set_node_attributes(self,{node[0]:FactorToAdd},'InitialBelief')   

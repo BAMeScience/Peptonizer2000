@@ -31,9 +31,9 @@ save = SaveResultsToCsv(Resultsdict,Nodetypes,args.out)
 
 #if __name__=='__main__':
 
-#    GraphMLPath = '/home/tholstei/repos/PepGM_all/PepGM/results/SIHUMIx_CT_Underflow/CAMPI_SIHUMIx/SIHUMI_DB1UNIPROT_PepGM_graph.graphml'
-#    alpha = 0.8
-#    beta = 0.4
+#    GraphMLPath = '/home/tanja/Peptonizer2000/Peptonizer2000/results/CAMPI1_SIHUMIx_allbacteria_s8_regularized_priors/CAMPI_SIHUMIx/SIHUMI_DB1UNIPROT_PepGM_graph.graphml'
+#    alpha = 0.99
+#    beta = 0.5
 #    prior = 0.5
 #    max_iter = 10000
 #    tol = 0.05

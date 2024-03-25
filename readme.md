@@ -93,7 +93,7 @@ The Peptonizer2000 workflow is comprised of the following steps:
 
 
 <div align="center">
-    <img src="images/workflow.png" alt="worklfow scheme" width="500">
+    <img src="images/workflow.png" alt="workflow scheme" width="500">
 </div>
 
 <br>
@@ -108,7 +108,7 @@ The Peptonizer2000 workflow is comprised of the following steps:
 
 * Your raw spectrum file in mgf format
 * A reference database in fasta format <br>
-* A config file with your parameters for X!Tandem and MS2!Rescore and the Unipept query. A more detaile description of the configuration file can be found below. Additoinally, an exemplary config file is porvided in this repository.
+* A config file with your parameters for X!Tandem and MS2!Rescore and the Unipept query. A more detailed description of the configuration file can be found below. Additionally, an exemplary config file is porvided in this repository.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -223,18 +223,44 @@ All Peptonizer2000 output files are saved into the results folder and include th
 
 Main results: <br>
 
-- PepGM_Results.csv: Table with values ID, score, type (contains all taxids under 'ID' and all probabilities under '
+- Peptonizer_Results.csv: Table with values ID, score, type (contains all taxids under 'ID' and all probabilities under '
   score' tosterior probabilities of n (default: 15) highest scoring taxa <br>
   <br>
 
 Additional (intermediate): <br>
 - Intermediate results folder sorted by their prior value for all possible grid search parameter combinations
-- mapped_taxids_weights.csv: csv file of all taxids that had at least one protein map to them and their weight 
+- TaxaWeights.csv: csv file of all taxids that had at least one protein map to them and their weight 
 - PepGM_graph.graphml: graphml file of the graphical model (without convolution tree factors). Useful to visualize the graph structure and peptide-taxon connections <br>
 - paramcheck.png: barplot of the metric used to determine the graphical model parameters for n (default: 15) best performing parameter combinations <br>
+- additional .csv files resulting from the clustering of taxa by peptidome
 - log files for bug fixing
 
 <p align="right">(<a href="#top">back to top</a>)</p>
+
+
+## Testing te Peptonizer
+<!-- Testing -->
+
+To test the Peptonizer2000 and see if it is set up correctly on your machine, we provide some test files under resources/test_files. These should be dowloaded automatically if you follow the installation instructions above. The test files are a .fasta database and a zipped .mgf specturm file, from the sample S03 of the [CAMPI study](https://www.nature.com/articles/s41467-021-27542-8) and are also available through [PRIDE under PXD023217](https://www.ebi.ac.uk/pride/archive/projects/PXD023217/). The spectral file is dowloaded using wget if you follow the instructions below.
+
+To execut ea test run of the Peptonizer2000 using the provided files: 
+ 
+ 1. Follow the installation instructions above
+ 2. In you terimnal, go to the folder resources/test_files
+ 3. execute the following code to download the spectral file and move the fasta file, config file and spectral file to the right directories
+ ```sh
+ wget https://ftp.pride.ebi.ac.uk/pride/data/archive/2022/02/PXD023217/S03.mgf -O ../SampleData/S03.mgf
+ cp ./SIHUMI_DB1UNIPROT_UNI.fasta ../Databases/
+ cp ./config.yaml ../../config/
+ ```
+ 4. Lastly, you need to make some alterations to the provided example config file.
+    - under 'xtandem_default', complete the path with the path to the current Peptonizer workflow folder
+    - input the path to the S03 spectral file. It should be something like 'path_to_workflow_directory/resources/SampleData/S03.mgf'
+
+
+You should now me all set up to run the Peptonizer2000 on the test files. 
+
+
 
 
 
@@ -249,8 +275,7 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 <!-- CONTACT -->
 ## Contact
 
-Tanja Holstein - [@HolsteinTanja](https://twitter.com/HolsteinTanja) - tanja.holstein@bam.de <br>
-Franziska Kistner - [LinkedIn](https://www.linkedin.com/in/franziska-kistner-58a57b18b) - franziska.kistner@bam.de <br>
+Tanja Holstein - [@HolsteinTanja](https://twitter.com/HolsteinTanja) - tanja.holstein@ugent.be <br>
 Pieter Verschaffelt - pieter.verschaffelt@ugent.be
 
 <p align="right">(<a href="#top">back to top</a>)</p>
