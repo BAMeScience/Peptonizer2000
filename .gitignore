@@ -1,6 +1,9 @@
 results/*
 !results/.gitkeep
 
+config/*
+!config/.gitkeep
+
 resources/*
 resources/taxidMapping/protacc2taxids_virus.txt
 !resources/.gitkeep
