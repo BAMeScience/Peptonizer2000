@@ -54,6 +54,9 @@
 
 
 <!-- ABOUT THE PROJECT -->
+
+## This readme describes the config for a snakemake workflow streamlining analysis using x!Tandem, ms2rescore and the Peptonizer. Use it if you want to start your analysis directly from a .mgf and .fasta file. Be aware that we do not maintain X!Tandem nor ms2rescore - should you encounter issues, please use the workflow provided in the master branch and carry out the database search and rescroing separately. 
+
 ## About The Project
 
 Introducing the Peptonizer2000 - a tool that combines the capabilities of Unipept and PepGM to analyze
