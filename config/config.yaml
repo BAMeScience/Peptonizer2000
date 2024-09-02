@@ -7,17 +7,17 @@ ResourcesDir: 'resources/'
 
 
 #Name of folder for the Peptonizer run in the results folder
-ExperimentName: 'S07_IGC_noreg'
+ExperimentName: 'S07_new_unipept'
 TaxaRank: 'species'
 
-FilterSpectra: False
-AddHostandCrapToDB: False
+FilterSpectra: True
+AddHostandCrapToDB: True
 
-StartFromPout: False
-PoutFiles: ''
+StartFromPout: True
+PoutFiles: '/home/tanja/Peptonizer2000/Peptonizer2000/results/s07_root/CAMPI_SIHUMIx/S07/ms2rescore/rescored/rescored.psms.tsv'
 
-StartFromUnipeptResponse: True
-PreviousUnipeptQueryResultsDir: '/home/tanja/Peptonizer2000/Peptonizer2000/results/S07_IGC_reg/CAMPI_SIHUMIx/'
+StartFromUnipeptResponse: False
+PreviousUnipeptQueryResultsDir: 'results/s07_root/CAMPI_SIHUMIx/'
 
 
 #xtandem parameters
@@ -50,24 +50,24 @@ SpectrumTitlePattern: '(controllerType=[\\d]+ controllerNumber=[\\d]+ scan=[\\d]
 
 #sample specific parameters
 #sample specific parameters
-InputSpectra: ['resources/SampleData/ftp.pride.ebi.ac.uk/pride/data/archive/2022/02/PXD023217/S07.mgf'] #paths to input spectra, should be list, all spectra need to be in the same directory
+InputSpectra: ['resources/SampleData/ftp.pride.ebi.ac.uk/pride/data/archive/2022/02/PXD023217/S05.mgf'] #paths to input spectra, should be list, all spectra need to be in the same directory
 SampleName: 'CAMPI_SIHUMIx'  #Name of the sample. Will be the subfolder of your experiment name
-ReferenceDBName: 'GUT_DB1IGC' # reference DB used
+ReferenceDBName: 'SIHUMI_DB1UNIPROT' # reference DB used
 
 
 #UnipeptQueryParameters
 TaxaNumber: 150
 targetTaxa: 1   #comma separated taxa to be included in Unipept query 
 FDR: 0.01
-Regularize: False
+Regularize: True
 
 
 #PepGM parameters
 TaxaInPlot: 25      #how many taxa should appear in the final results barplot
 TaxaInProteinCount: 15 #how many taxa should appear in the protein counting barplot
-Alpha: [0.9,0.99] #increments of parameter alpha to use for the grid earch
-Beta: [0.7] #range of parameter beta to use for the grid search
-prior: [0.5]
+Alpha: [0.7,0.8,0.9,0.99] #increments of parameter alpha to use for the grid earch
+Beta: [0.5,0.6,0.7,0.8,0.9] #range of parameter beta to use for the grid search
+prior: [0.3,0.5]
 
 #ParameterEvaluationParameter
 SimilarityThreshold: 0.9

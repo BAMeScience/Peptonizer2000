@@ -40,13 +40,15 @@ rule UnipeptQuery:
           InputPoutFile
     params:
           targetTaxa = targetTaxa,
-          FDR = FDR
+          FDR = FDR,
+          Rank = TaxaRank
     log: ResultsDir + 'UnipeptResponse.log'
     output: 
           ResultsDir + 'UnipeptResponse.json',
           ResultsDir + 'UnipeptPeptides.json'
     conda: 'envs/Unipeptquery.yml'   
-    shell: "python3 workflow/scripts/UnipeptGetTaxonomyfromPout.py --UnipeptResponseFile {output[0]} --pep_out {output[1]} --TaxonomyQuery {params.targetTaxa} --FDR {params.FDR} --PoutFile {input} --logfile {log}" 
+    shell: "python3 workflow/scripts/GetTaxonomyFromUnipept.py --PoutFile {input} --UnipeptResponseFile {output[0]} --UnipeptPeptides {output[1]} --TaxonomyQuery {params.targetTaxa} --FDR {params.FDR} --TaxaRank {params.Rank} --logfile {log}"
+    #"python3 workflow/scripts/UnipeptGetTaxonomyfromPout.py --UnipeptResponseFile {output[0]} --pep_out {output[1]} --TaxonomyQuery {params.targetTaxa} --FDR {params.FDR} --PoutFile {input} --logfile {log}" 
 
 
 def StartFromUnipept(condition):
@@ -63,12 +65,11 @@ rule ParseToUnipeptCSV:
           
           
     params: 
-      NumberofTaxa = TaxaNumber,
-      TaxaRank = TaxaRank
+      NumberofTaxa = TaxaNumber
            
     log: ResultsDir + 'ParsetoCSV.log'
     output: 
             ResultsDir + 'GraphDataframe.csv',
             ResultsDir +'TaxaWeights.csv'
     conda: 'envs/graphenv.yml' 
-    shell: "python3 workflow/scripts/WeightTaxa.py --UnipeptResponseFile {input[0]} --UnipeptPeptides {input[1]} --out {output[0]} --TaxaWeightFile {output[1]} --NumberOfTaxa {params.NumberofTaxa} --TaxaRank {params.TaxaRank}" 
+    shell: "python3 workflow/scripts/weight_taxa.py --UnipeptResponseFile {input[0]} --UnipeptPeptides {input[1]} --out {output[0]} --out_weight {output[1]} --NumberOfTaxa {params.NumberofTaxa} " 

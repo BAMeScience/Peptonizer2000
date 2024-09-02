@@ -195,14 +195,3 @@ args = init_argparser()
 DF,Weights = WeightTaxa(args.UnipeptResponseFile, args.UnipeptPeptides, args.NumberOfTaxa, TaxaRank = args.TaxaRank)
 DF.to_csv(args.out)
 Weights.to_csv(args.TaxaWeightFile)
-
-#if __name__ == '__main__':
-    #args = init_argparser()
-    #DF = WeightTaxa(args.UnipeptResponseFile, args.UnipeptPeptides, args.NumberOfTaxa, args.PeptidomeSize, TaxaRank = args.TaxaRank)
-    #DF.to_csv(args.out)
-
-   
-    #DF = WeightTaxa('/home/tanja/Peptonizer2000/Peptonizer2000/results/CAMPI1_SIHUMIx_allbacteria/CAMPI_SIHUMIx/UnipeptResponse.json','/home/tanja/Peptonizer2000/Peptonizer2000/results/CAMPI1_SIHUMIx_allbacteria/CAMPI_SIHUMIx/UnipeptPeptides.json',
-                    #50,'/home/tanja/Peptonizer2000/Peptonizer2000/resources/taxa_peptidome_size.tsv')
-    #DF.to_csv('/home/tanja/Peptonizer2000/Peptonizer2000/results/CAMPI1_SIHUMIx_allbacteria/CAMPI_SIHUMIx/GraphDataframe_test.csv')
-    
