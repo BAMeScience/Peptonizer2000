@@ -7,13 +7,13 @@ ResourcesDir: 'resources/'
 
 
 #Name of folder for the Peptonizer run in the results folder
-ExperimentName: 'S07_new_unipept'
-TaxaRank: 'species'
+ExperimentName: 'S08_new_unipept'
+TaxaRank: "species"
 
 FilterSpectra: True
 AddHostandCrapToDB: True
 
-StartFromPout: True
+StartFromPout: False
 PoutFiles: '/home/tanja/Peptonizer2000/Peptonizer2000/results/s07_root/CAMPI_SIHUMIx/S07/ms2rescore/rescored/rescored.psms.tsv'
 
 StartFromUnipeptResponse: False
@@ -50,7 +50,7 @@ SpectrumTitlePattern: '(controllerType=[\\d]+ controllerNumber=[\\d]+ scan=[\\d]
 
 #sample specific parameters
 #sample specific parameters
-InputSpectra: ['resources/SampleData/ftp.pride.ebi.ac.uk/pride/data/archive/2022/02/PXD023217/S05.mgf'] #paths to input spectra, should be list, all spectra need to be in the same directory
+InputSpectra: ['resources/SampleData/ftp.pride.ebi.ac.uk/pride/data/archive/2022/02/PXD023217/S08.mgf'] #paths to input spectra, should be list, all spectra need to be in the same directory
 SampleName: 'CAMPI_SIHUMIx'  #Name of the sample. Will be the subfolder of your experiment name
 ReferenceDBName: 'SIHUMI_DB1UNIPROT' # reference DB used
 

@@ -71,5 +71,5 @@ rule ParseToUnipeptCSV:
     output: 
             ResultsDir + 'GraphDataframe.csv',
             ResultsDir +'TaxaWeights.csv'
-    conda: 'envs/graphenv.yml' 
+    conda: 'envs/Unipeptquery.yml' 
     shell: "python3 workflow/scripts/weight_taxa.py --UnipeptResponseFile {input[0]} --UnipeptPeptides {input[1]} --out {output[0]} --out_weight {output[1]} --NumberOfTaxa {params.NumberofTaxa} " 

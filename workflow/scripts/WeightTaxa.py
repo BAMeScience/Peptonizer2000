@@ -78,7 +78,7 @@ def GetLineageAtSpecifiedRank(taxid, TaxaRank):
     return list(taxids)
 
 
-def WeightTaxa(UnipeptResponse, PeptScoreDict, MaxTax,*PeptidesPerTaxon, chunks=True, N=0, SelectRank = True, TaxaRank):
+def WeightTaxa(unipept_response, PeptScoreDict, MaxTax,*PeptidesPerTaxon, chunks=True, N=0, SelectRank = True, TaxaRank):
     """
     Weight inferred taxa based on their (1) degeneracy and (2) their proteome size.
     Parameters
@@ -102,31 +102,26 @@ def WeightTaxa(UnipeptResponse, PeptScoreDict, MaxTax,*PeptidesPerTaxon, chunks=
         Top scoring taxa
 
     """
-    with open(PeptScoreDict, 'r') as file:
-        PeptScoreDictload = json.load(file)
+    # Load the peptide score dictionary
+    with open(PeptScoreDict, "r") as file:
+        pept_score_dict_loaded = json.load(file)
 
-    if chunks:
-        with open(UnipeptResponse, 'r') as file:
-            UnipeptDict = {"peptides": []}
-            for line in file:
-                try:
-                    UnipeptDict["peptides"].extend(json.loads(line)["peptides"])
-                except:
-                    # TODO: Pieter fixes internal server error
-                    # in the meantime, we work with the incomplete mapping
-                    # UnipeptDict["peptides"] = [json.loads(line)["peptides"]]
-                    continue
-
-    else:
-        with open(UnipeptResponse, 'r') as file:
-            UnipeptDict = json.load(file)
+    with open(unipept_response, "r") as file:
+        unipept_dict = json.load(file)
 
     # Convert a JSON object into a Pandas DataFrame
     # record_path Parameter is used to specify the path to the nested list or dictionary that you want to normalize
-    UnipeptFrame = pd.json_normalize(UnipeptDict, record_path=['peptides'])
+    print("Normalizing peptides and converting to dataframe...")
+    unipept_frame = pd.json_normalize(unipept_dict)
     # Merge psm_score and number of psms
-    UnipeptFrame = pd.concat([UnipeptFrame,
-                              pd.json_normalize(UnipeptFrame['sequence'].map(PeptScoreDictload))], axis=1)
+    unipept_frame = pd.concat(
+        [
+            unipept_frame,
+            pd.json_normalize(unipept_frame["sequence"].map(pept_score_dict_loaded)),
+        ],
+        axis=1,
+    )
+
     # Score the degeneracy of a taxa, i.e.,
     # how conserved a peptide sequence is between taxa.
     #map all taxids in the list in the taxa column back to their taxid at species level
